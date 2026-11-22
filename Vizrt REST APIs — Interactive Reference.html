@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viz Graphic Hub REST API — Interactive Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbfbfa;--panel:#ffffff;--side:#f4f4f2;--ink:#1d1d1f;--mute:#6b6b70;--line:#e6e5e1;--soft:#f0efec;
+  --accent:#3a5bd9;--accent-soft:#eaeefc;--code-bg:#16181d;--code-ink:#e6e6e6;--code-mute:#8b93a3;
+  --get:#1f8a5b;--post:#2f63d6;--put:#b7791f;--delete:#c53b3b;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--sans:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#121315;--panel:#17181b;--side:#141517;--ink:#ececee;--mute:#9a9aa2;--line:#2a2b30;--soft:#1e1f23;
+  --accent:#7d97ff;--accent-soft:#1f2640;--code-bg:#0d0e10;
+  --get:#3fbf86;--post:#6e95ff;--put:#e0a94a;--delete:#f07272;}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+code,.mono{font-family:var(--mono);font-size:.88em}
+:not(pre)>code{background:var(--soft);border:1px solid var(--line);padding:1px 5px;border-radius:4px}
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+/* sidebar */
+aside{position:sticky;top:0;height:100vh;overflow:auto;background:var(--side);border-right:1px solid var(--line);padding:18px 14px 40px}
+.brand{font-weight:700;font-size:15px;letter-spacing:-.01em;margin:2px 6px 2px}
+.brand small{display:block;font-weight:500;color:var(--mute);font-size:12px}
+.search{margin:14px 0 10px;position:relative}
+.search input{width:100%;padding:8px 10px 8px 30px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font:inherit;font-size:13px;outline:none}
+.search input:focus{border-color:var(--accent)}
+.search svg{position:absolute;left:9px;top:9px;color:var(--mute)}
+.nav-group{margin-top:14px}
+.nav-group h4{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:0 6px 4px;font-weight:600}
+.nav a{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:6px;color:var(--ink);font-size:13.5px}
+.nav a:hover{background:var(--soft)}
+.nav a.active{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.nav a .dots{display:flex;gap:3px}
+.nav a .dots i{width:6px;height:6px;border-radius:50%;display:block}
+.nav .hit{display:block;padding:3px 8px 3px 18px;font-size:12.5px;color:var(--mute);font-family:var(--mono)}
+.nav .hit:hover{color:var(--ink)}
+/* main */
+main{min-width:0}
+.topbar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 32px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.topbar label{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:600;display:flex;flex-direction:column;gap:3px}
+.topbar input{font:13px var(--mono);padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);outline:none;min-width:0}
+.topbar input:focus{border-color:var(--accent)}
+#baseUrl{width:240px}#user{width:110px}#pass{width:110px}
+.authpreview{font:12px var(--mono);color:var(--mute);align-self:flex-end;padding-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:330px}
+.langs{margin-left:auto;display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;align-self:flex-end}
+.langs button{border:0;background:var(--panel);color:var(--mute);font:500 12.5px var(--sans);padding:6px 11px;cursor:pointer;border-right:1px solid var(--line)}
+.langs button:last-child{border-right:0}
+.langs button.on{background:var(--accent);color:#fff}
+.content{max-width:1040px;padding:28px 32px 120px}
+h1{font-size:30px;letter-spacing:-.02em;margin:8px 0 6px}
+h2{font-size:22px;letter-spacing:-.015em;margin:0 0 4px}
+h3{font-size:15px;margin:22px 0 8px}
+.lead{color:var(--mute);font-size:15.5px;max-width:760px}
+section.res{padding-top:36px;margin-top:36px;border-top:1px solid var(--line);scroll-margin-top:70px}
+.res-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mute);white-space:nowrap}
+.pill.full{color:var(--get);border-color:color-mix(in srgb,var(--get) 40%,transparent)}
+.pill.limited{color:var(--put);border-color:color-mix(in srgb,var(--put) 40%,transparent)}
+.pill.none{color:var(--delete);border-color:color-mix(in srgb,var(--delete) 40%,transparent)}
+.pill.noauth{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.intro p{margin:6px 0;max-width:780px;color:var(--ink)}
+.intro ul{margin:4px 0;padding-left:20px}
+/* endpoint */
+.ep{border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-top:14px;overflow:hidden;scroll-margin-top:70px}
+.ep-h{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;user-select:none}
+.ep-h:hover{background:var(--soft)}
+.m{font:600 11.5px var(--mono);padding:3px 0;border-radius:5px;color:#fff;width:62px;text-align:center;flex:none}
+.m.GET{background:var(--get)}.m.POST{background:var(--post)}.m.PUT{background:var(--put)}.m.DELETE{background:var(--delete)}
+.path{font:500 13.5px var(--mono);word-break:break-all}
+.path .p{color:var(--accent)}
+.ep-sum{color:var(--mute);font-size:13px;margin-left:auto;text-align:right;flex:0 1 38%}
+.chev{flex:none;color:var(--mute);transition:transform .15s}
+.ep.open .chev{transform:rotate(90deg)}
+.ep-b{display:none;border-top:1px solid var(--line);grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+.ep.open .ep-b{display:grid}
+.ep-l{padding:14px 16px;border-right:1px solid var(--line);min-width:0}
+.ep-r{padding:14px;background:var(--soft);min-width:0}
+.ep-l p{margin:0 0 10px}
+.k{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);font-weight:600;margin:14px 0 6px}
+.k:first-child{margin-top:0}
+.codes{display:flex;flex-direction:column;gap:4px}
+.code-row{display:flex;gap:8px;font-size:13px;align-items:baseline}
+.code-row b{font:600 12px var(--mono);padding:1px 6px;border-radius:4px;flex:none}
+.c2{background:color-mix(in srgb,var(--get) 15%,transparent);color:var(--get)}
+.c4{background:color-mix(in srgb,var(--put) 16%,transparent);color:var(--put)}
+.c5{background:color-mix(in srgb,var(--delete) 14%,transparent);color:var(--delete)}
+.code-row span{color:var(--mute)}
+ul.tips{margin:0;padding-left:18px;font-size:13.5px}
+ul.tips li{margin:2px 0}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font:12px var(--mono);background:var(--soft);border:1px solid var(--line);padding:1px 7px;border-radius:5px}
+.req .chip{border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent)}
+.params{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center}
+.params label{font:12.5px var(--mono);color:var(--mute)}
+.params input{font:12.5px var(--mono);padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);width:100%;outline:none}
+.params input:focus{border-color:var(--accent)}
+/* code block */
+.cb{background:var(--code-bg);border-radius:9px;overflow:hidden;margin-bottom:10px}
+.cb-h{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 6px 12px;border-bottom:1px solid #2a2d35;font:12px var(--sans);color:var(--code-mute)}
+.cb pre{margin:0;padding:12px 14px;overflow:auto;color:var(--code-ink);font:12.5px/1.6 var(--mono);max-height:420px;white-space:pre}
+.copy{background:transparent;border:1px solid #3a3e48;color:#cfd3dc;font:500 11.5px var(--sans);padding:3px 9px;border-radius:5px;cursor:pointer}
+.copy:hover{border-color:#6b7280}
+.copy.ok{color:#5fd39a;border-color:#2f6b4f}
+.tk-s{color:#a5d6a7}.tk-k{color:#c792ea}.tk-f{color:#82aaff}.tk-c{color:#6b7280}.tk-t{color:#f78c6c}.tk-a{color:#ffcb6b}
+/* try it */
+.try{border:1px dashed var(--line);border-radius:9px;padding:10px 12px;background:var(--panel)}
+.try textarea{width:100%;min-height:150px;font:12px/1.5 var(--mono);border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);color:var(--ink);resize:vertical}
+.btn{font:600 12.5px var(--sans);padding:6px 13px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.warn{background:var(--delete);border-color:var(--delete)}
+.try-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.status{font:12px var(--mono);color:var(--mute)}
+.resp{margin-top:10px;display:none}
+/* field table */
+details.fields{margin-top:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+details.fields summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:13.5px;list-style:none;display:flex;justify-content:space-between}
+details.fields summary::-webkit-details-marker{display:none}
+details.fields summary::after{content:"Show";font-weight:500;color:var(--accent);font-size:12.5px}
+details.fields[open] summary::after{content:"Hide"}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 12px;border-top:1px solid var(--line);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);font-weight:600;background:var(--soft)}
+td.fn{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+td.fn.sub{padding-left:28px;color:var(--mute)}
+.ty{font:11.5px var(--mono);color:var(--mute)}
+.ed{font-size:11px;font-weight:600;color:var(--get)}
+.ro{font-size:11px;color:var(--mute)}
+/* overview cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:16px}
+.card{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:14px 16px}
+.card h4{margin:0 0 6px;font-size:14px}
+.card p{margin:0;color:var(--mute);font-size:13.5px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13px}
+.kv dt{font-family:var(--mono);color:var(--accent)}.kv dd{margin:0;font-family:var(--mono);color:var(--mute);word-break:break-all}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:9px 13px;border-radius:0 8px 8px 0;font-size:13.5px;margin:12px 0}
+.warn-note{border-left-color:var(--delete);background:color-mix(in srgb,var(--delete) 9%,transparent)}
+.changelog details{border-top:1px solid var(--line);padding:8px 0}
+.changelog summary{cursor:pointer;font:600 13px var(--mono)}
+.changelog ul{margin:6px 0 0;padding-left:20px;font-size:13.5px;color:var(--mute)}
+.empty{color:var(--mute);padding:40px 0;text-align:center;display:none}
+.apis{display:flex;gap:4px;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:3px;align-self:flex-end}
+.apis button{border:0;background:transparent;color:var(--mute);font:600 13px var(--sans);padding:6px 12px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.apis button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.authfield.hide{display:none}
+.menu-btn{display:none}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  aside{position:fixed;inset:0 auto 0 0;width:280px;z-index:20;transform:translateX(-100%);transition:transform .2s;box-shadow:0 0 40px rgba(0,0,0,.2)}
+  aside.show{transform:none}
+  .menu-btn{display:inline-flex;align-self:flex-end;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;padding:6px 10px;cursor:pointer}
+  .ep-b{grid-template-columns:1fr}.ep-l{border-right:0;border-bottom:1px solid var(--line)}
+  .ep-sum{display:none}.content,.topbar{padding-left:16px;padding-right:16px}.langs{margin-left:0}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside id="side">
+  <div class="brand" id="brand"></div>
+  <div class="search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" placeholder="Search endpoints, fields…  ( / )" autocomplete="off">
+  </div>
+  <nav class="nav" id="nav"></nav>
+</aside>
+<main>
+  <div class="topbar">
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <div class="apis" id="apis"><button data-api="gh">Graphic Hub</button><button data-api="pds">Pilot Data Server</button></div>
+    <label>Base URL<input id="baseUrl" value="http://127.0.0.1:19398"></label>
+    <label class="authfield">User<input id="user" value="Admin"></label>
+    <label class="authfield">Password<input id="pass" value="VizDb" type="password"></label>
+    <div class="authpreview authfield" id="authPrev"></div>
+    <div class="langs" id="langs"></div>
+  </div>
+  <div class="content" id="content"></div>
+</main>
+</div>
+
+<script>
+/* ============================== DATA ============================== */
+const GH_GROUPS=["Basic resources","Advanced resources","REST agent resources","REST configuration","Deploy Agent"];
+const VDF="application/vnd.vizrt.payload+xml";
+const NS='xmlns="http://www.vizrt.com/types"';
+const L=(e)=>["self: The current atom:entry "+e+".","describedby: The properties of the current atom:entry "+e+"."];
+const FILE_LINKS=["up: The parent folder of the file.","self: The current atom:entry file.","describedby: The properties (VDF) of the file.","controlmodel: Control model of the file (only included if one is available).","history: Atom feed of all history entries of the file.","addon: Atom feed of all addons of the file.","media:content type=\"image\": Image download for files of type IMAGE.","media:thumbnail: Thumbnail of the file."];
+const RIGHTS=["access-rights||0|The list of access rights|user-rights,group-rights,world-rights","user-rights|boolean|1|User rights set to write (else read-only)","group-rights|boolean|1|Group rights set to write (else read-only)","world-rights|boolean|1|World rights set to write (else read-only)"];
+const rightsXml=(u,g,w)=>`  <field name="access-rights">\n    <field name="user-rights"><value>${u}</value></field>\n    <field name="group-rights"><value>${g}</value></field>\n    <field name="world-rights"><value>${w}</value></field>\n  </field>`;
+const pl=(model,body)=>`<payload ${NS}${model?`\n  model="HOST/model/${model}"`:''}>\n${body}\n</payload>`;
+const fld=(n,v)=>`  <field name="${n}"><value>${v}</value></field>`;
+
+const GH_RES=[
+/* ---------- BASIC ---------- */
+{id:"service-document",t:"Service Document",g:0,c:"full",d:["The root resource of the API: an Atom Service Document (RFC 5023) listing every collection the server exposes. Clients should start here to discover resource locations instead of hard-coding them.","It's always published at the root of the GH REST service port (default <code>19398</code>), e.g. <code>http://vizgh.example.com:19398/</code>."],
+ ep:[["GET","/","Discover all collections (application/atomsvc+xml)","200,404,500",{}]]},
+
+{id:"folders",t:"Folders",g:0,c:"full",d:["The folder tree of the Graphic Hub, exposed as an Atom feed you navigate via each entry's <code>rel=\"down\"</code> link. Folder properties are VDF documents reachable from the feed."],
+ ep:[["GET","/folders","Root folder structure (Atom feed)","200,404:Invalid parent folder uuid.,403,500,502",{ln:["up: Parent folder, or the /data root folder if there is none.","self: The current folder entry.","down: Sub-folders (includes thr:count).","describedby: Folder properties (VDF).","addon: Atom feed of all addons on the folder.","related: Atom feed of all files in the folder."]}],
+  ["GET","/metadata/folder/{folder-id:389fc145-284e-4664-ab4c-dc009951e2be}","Folder properties (VDF)","200,404:Invalid folder uuid.,403,500,502",{}],
+  ["GET","/folders?target=default","Default folder location (created if missing)","200,404,403,500,502",{}],
+  ["POST","/folder/{parent-id:49ad30fb-036a-47c7-b098-cf8472ad24eb}/","Create a folder under a parent","201:The response body is the new folder.,400:Invalid input — check the request headers.,403,404:Creation failed.,500",{ct:VDF,bf:"postfolder.xml",rq:["name"],
+    b:pl("folder",[fld("name","new folder"),fld("type","1"),rightsXml(true,true,true),fld("owner-id","8614")].join("\n")),
+    tp:["You can also POST an <code>application/atom+xml;type=feed</code> to create a folder.","The only required field is <code>//payload/field[@name=\"name\"]</code> or <code>atom:title</code>.","Setting <code>type</code> may fail: a project cannot be created under a folder.","Folders can't be created in batches."]}],
+  ["PUT","/folder/{folder-id:49ad30fb-036a-47c7-b098-cf8472ad24eb}/","Modify (rename / move / re-own) a folder","200:The response body is the modified folder.,400:Invalid input — check headers and content type.,403,404:Modification failed.,500",{ct:VDF,bf:"putfolder.xml",rq:["name"],
+    b:pl("folder",[fld("id","49ad30fb-036a-47c7-b098-cf8472ad24eb"),fld("parent-id","aaa87dfd-bbbb-46f5-ae6d-2bd377047deb"),fld("name","changed_folder"),rightsXml(true,false,true),fld("owner-id","999")].join("\n")),
+    tp:["Only send changed fields to minimise bandwidth.","Move a folder by changing <code>parent-id</code>.","<code>owner-id</code> is a user id from Users."]}],
+  ["DELETE","/folder/{folder-id:49ad30fb-036a-47c7-b098-cf8472ad24eb}/","Delete a folder and all sub-folders","200,204,403,404:Resource to delete not found.,400,500",{tp:["Folders containing files referenced from outside the folder cannot be deleted."]}]],
+ f:["id|uuid|0|The folder identifier","parent-id|uuid|1|The parent folder identifier","name|string|1|The name","type|integer|0|1 = folder, 2 = project","date-created|datetime|0|Creation date and time","date-expired|datetime|0|Date when the folder expires and can be deleted (null = not set)","owner-id|integer|1|User id of the folder owner","is-system-folder|boolean|0|Folder is a system folder",...RIGHTS]},
+
+{id:"files",t:"Files",g:0,c:"full",d:["Files stored on the Graphic Hub. A folder's files are listed as an Atom feed; each file's properties are a VDF document."],
+ ep:[["GET","/files/{folder-id:150F0D08-7BF9-894A-B8FC50242D6B7032}/","List files in a folder (Atom feed)","200,403,404:Folder not found.,500,502",{ln:[...FILE_LINKS,"vosmt: Viz open search media type."],tp:["<code>category</code> holds the file type."]}],
+  ["GET","/file/{file-id:97398e73-b305-de45-8eae-7a37bcc071ab}/{folder-id:150F0D08-7BF9-894A-B8FC50242D6B7032}/","Single file entry with its 'up' link set to a given folder","200,403,404:Folder not found.,500,502",{ln:FILE_LINKS}],
+  ["GET","/files/{folder-id:150F0D08-7BF9-894A-B8FC50242D6B7032}/?term={type:IMAGE}","List files of one type in a folder","200,403,404:Folder not found.,500,502",{tp:["<code>term</code> is a type name from Types (IMAGE, AUDIO_CLIP, VIDEO_CLIP, …)."]}],
+  ["GET","/metadata/file/{file-id:a743d4e6-bcb7-c545-9cde-41d881c133cd}/","File properties (VDF)","200,403,404:File not found.,500,502",{tp:["<code>type</code> → Types; <code>locked</code>, <code>checked-out</code>, <code>owner</code>, <code>modifier</code> → Users; <code>keywords</code> → Keywords; <code>folder-links</code> → Folders."]}],
+  ["POST","/checksum/files","Check whether files still exist","200:File exists if the response contains id and original-checksum.,400:Wrong payload format.,403,404,500",{ct:VDF,bf:"postfile.xml",
+    b:`<?xml version="1.0" encoding="UTF-8"?>\n<payload ${NS}>\n  <field name="check-ids">\n    <list>\n      <payload>\n        <field name="id"><value>66AF0CD5-457E-7E47-AD45-A1B8FABDA0E3</value></field>\n      </payload>\n    </list>\n  </field>\n</payload>`}],
+  ["PUT","/metadata/file/{file-id:aa34d9c0-0553-4b1a-b376-188877d698bd}/","Modify file properties (rename, move, link, keywords, delete)","200:The response body is the modified file.,400:Invalid input — check headers and content type.,403,404:Modification failed.,500",{ct:VDF,bf:"putfile.xml",
+    b:pl("file",`${fld("name","Jellyf")}\n  <field name="folder-links">\n    <list>\n      <payload>\n        <field name="folder-link-id"><value>24f20031-d35b-8b4a-8610-3718b73837c2</value></field>\n        <field name="folder-link-name"><value>my_link_name</value></field>\n      </payload>\n    </list>\n  </field>`),
+    tp:["Only send changed fields.","<b>Move</b> a file by replacing its folder-link entry with another <code>folder-link-id</code>.","<b>Add a link</b> by adding a folder-link entry; <b>rename a link</b> via <code>folder-link-name</code>.","<b>Delete</b> a file by removing all folder-link entries — there's no DELETE verb for files.","Add/remove keywords by adding/removing <code>keyword-id</code> entries.","References can't be modified. Files can't be modified in batches."]}]],
+ f:["id|uuid|0|The file identifier","checksum|checksum|0|The file checksum","original-checksum|checksum|0|Checksum set by the creating/modifying application (null if not set)","name|string|1|The file name","type|integer|0|The file type id","size|integer|0|File size in bytes","checked-out|integer|1|User id that checked out the file (0 = not checked out)","locked|integer|1|User id that locked the file (0 = not locked)","owner|integer|1|User id of the owner","modifier|integer|0|User id of the last modifier","date-created|datetime|1|Creation date and time","date-modified|datetime|1|Last modification","date-expired|datetime|1|Expiry date (null = not set)",...RIGHTS,"keywords||0|Assigned keywords|keyword-id","keyword-id|integer|1|Keyword identifier","references||0|File references|reference","reference|uuid|0|Referenced file id","file-links||0|File links|file-link","file-link|uuid|0|Linked file id","folder-links||0|Folder links|folder-link-id,folder-link-name","folder-link-id|uuid|1|Linked folder id","folder-link-name|string|1|Name of the file in that folder"]},
+
+{id:"users",t:"Users",g:0,c:"full",d:["Users on the Graphic Hub: an Atom feed whose entries link (<code>rel=\"describedby\"</code>) to VDF user properties."],
+ ep:[["GET","/users","List users (Atom feed)","200,403,404,500,502",{ln:L("user")}],
+  ["GET","/metadata/user/{user-id:1}/","User properties (VDF)","200,403,404:Invalid user id.,500,502",{}],
+  ["POST","/users","Create a user","201:The response body is the new user.,400:Invalid input (or the id/name already exists).,403,404,500",{ct:VDF,bf:"postuser.xml",rq:["id","name","full-name","group-id","access-rights"],
+    b:pl("user",[fld("id","321"),fld("name","newuser"),fld("full-name","New User"),fld("active","true"),fld("group-id","1"),rightsXml(true,true,true)].join("\n")),
+    tp:["An existing id or name returns 400.","<code>group-id</code> is an id from Groups."]}],
+  ["PUT","/metadata/user/{user-id:1}/","Modify a user","200:The response body is the modified user.,400,403,404,500",{ct:VDF,bf:"putuser.xml",rq:["id","name","full-name","group-id","access-rights"],
+    b:pl("user",[fld("id","321"),fld("name","modifieduser"),fld("full-name","User Modified"),fld("active","false"),fld("group-id","999"),rightsXml(true,false,true)].join("\n")),tp:["Only send changed fields.","Renaming to an existing name returns 400."]}],
+  ["DELETE","/metadata/user/{user-id:1}/","Delete a user","200,204,403,404,400,500",{}]],
+ f:["id|integer|0|The user identifier","name|string|1|Nickname / login name","full-name|string|1|Full name","active|boolean|1|User is active","group-id|integer|1|Group identifier",...RIGHTS]},
+
+{id:"groups",t:"Groups",g:0,c:"full",d:["User groups on the Graphic Hub. A user's <code>group-id</code> refers to a group's <code>id</code>."],
+ ep:[["GET","/groups","List groups (Atom feed)","200,403,404,500,502",{ln:L("group")}],
+  ["GET","/metadata/group/{group-id:1}/","Group properties (VDF)","200,403,404:Invalid group id.,500,502",{}],
+  ["POST","/groups","Create a group","201:The response body is the new group.,400:Invalid input (or the id/name already exists).,403,404,500",{ct:VDF,bf:"postgroup.xml",rq:["id","name","access-rights"],
+    b:pl("group",[fld("id","123"),fld("name","newgroup"),fld("active","true"),rightsXml(true,true,true)].join("\n"))}],
+  ["PUT","/metadata/group/{group-id:1}/","Modify a group","200:The response body is the modified group.,400,403,404,500",{ct:VDF,bf:"putgroup.xml",rq:["id","name","access-rights"],
+    b:pl("group",[fld("id","123"),fld("name","newnamegroup"),fld("active","false"),rightsXml(true,false,true)].join("\n"))}],
+  ["DELETE","/metadata/group/{group-id:1}/","Delete a group","200,204,403,404,400,409:Group is not empty.,500",{}]],
+ f:["id|integer|0|The group identifier","name|string|1|The group name","active|boolean|1|Group is active",...RIGHTS]},
+
+{id:"types",t:"Types",g:0,c:"full",d:["Read-only list of object types (IMAGE, AUDIO_CLIP, VIDEO_CLIP, …). Type names are used as the <code>term</code> filter on Files."],
+ ep:[["GET","/types","List types (Atom feed)","200,403,404,500,502",{ln:L("type")}],
+  ["GET","/metadata/type/{type-id:1}/","Type properties (VDF)","200,403,404:Type not found.,500,502",{}]],
+ f:["id|integer|0|Object type identifier","name|string|0|Object type name"]},
+
+{id:"keywords",t:"Keywords",g:0,c:"full",d:["Keywords that can be assigned to files via their <code>keywords</code> list."],
+ ep:[["GET","/keywords","List keywords (Atom feed)","200,403,404,500,502",{ln:L("keyword")}],
+  ["GET","/metadata/keyword/{keyword-id:11}/","Keyword properties (VDF)","200,403,404:Keyword not found.,500,502",{}],
+  ["POST","/keywords/","Create a keyword","201:The response body is the new keyword.,400,403,404,500",{ct:VDF,bf:"postkeyword.xml",rq:["name"],b:pl("keyword",[fld("id","12"),fld("name","created_keyword")].join("\n"))}],
+  ["PUT","/metadata/keyword/{keyword-id:12}/","Rename a keyword","200:The response body is the modified keyword.,400,403,404,500",{ct:VDF,bf:"putkeyword.xml",rq:["name"],b:pl("keyword",[fld("id","12"),fld("name","modified_keyword")].join("\n"))}],
+  ["DELETE","/metadata/keyword/{keyword-id:12}/","Delete a keyword","200,204,403,404,400,500",{}]],
+ f:["id|integer|0|Keyword identifier","name|string|1|Keyword name"]},
+
+{id:"thumbnail",t:"Thumbnail",g:0,c:"full",noauth:1,d:["A JPEG thumbnail for any file (some types such as shared memory have none)."],
+ ep:[["GET","/thumbnail/{file-id:eece6ea4-54d1-b54b-84f0-b57599547249}?size={size:large}","Thumbnail image (image/jpeg)","200,404:No thumbnail available for this item.,500,502",{bin:1,tp:["<code>size</code> is <code>small</code> or <code>large</code>.","Authentication is optional but strongly recommended — without it, the thumbnail is fetched as user <code>Admin</code>."]}]]},
+
+{id:"image",t:"Image",g:0,c:"full",d:["Download, upload and replace image binaries for files of type IMAGE."],
+ ep:[["GET","/image/{file-id:aa34d9c0-0553-4b1a-b376-188877d698bd}/","Download image (image/jpeg)","200,403,404:File not found or not an IMAGE.,500,502",{bin:1}],
+  ["GET","/image/{file-id:aa34d9c0-0553-4b1a-b376-188877d698bd}/?mime_type={mime_type:image/png}","Download image rendered as another format","200,403,404,500,502",{bin:1,x:{"Supported mime_type values":["image/jpeg","image/png","image/bmp","image/tiff","image/gif","image/tga"]}}],
+  ["POST","/folder/{folder-id:49ad30fb-036a-47c7-b098-cf8472ad24eb}/?compression={compression:DXT1}&quality={quality:HIGH}&name={name:my_image}","Upload a new image into a folder","201:The response is the new file's Atom entry.,400:Invalid input or the name already exists in the folder.,403,404,500",{up:"image.jpeg",ct:"image/jpeg",
+    tp:["Use <code>/folders?target=default</code> instead of <code>/folder/{id}/</code> to upload to the default folder (created if missing).","The name is taken from, in order: the <code>Slug</code> header → multipart form-data → the <code>name</code> query parameter.","Names in form-data / query must not contain <code>/ \\ # $ @ . : , ; ? * \" &lt; &gt; { }</code>, tab or newline. Slug names are auto-sanitised — read the response entry's title for the final name.","<code>compression</code> and <code>quality</code> are optional. Animated GIFs are not supported.","<code>multipart/form-data</code> is accepted for browser uploads; <code>Content-Disposition: filename</code> becomes the name."],
+    x:{"Content types":["image/jpeg","image/png","image/bmp","image/tiff","image/gif","image/tga","image/x-exr","image/vnd.radiance","image/vnd.ms-dds","multipart/form-data"],"compression":["AUTO","NONE","DXT1","DXT5"],"quality (mipmaps)":["LOW","MEDIUM","HIGH"]}}],
+  ["PUT","/image/{file-id:6d363330-e198-1e47-9f1a-c4b1b8bc7550}/","Replace an image's binary data","200,403,404:File not found or not an IMAGE.,500,502",{up:"image.jpeg",ct:"image/jpeg",tp:["A Content-Type header is required.","The image must already exist."]}]]},
+
+{id:"audio",t:"Audio",g:0,c:"full",d:["Download audio for files of type AUDIO_CLIP. Returned as <code>audio/wav</code>, <code>audio/mp3</code> or <code>audio/ogg</code>."],
+ ep:[["GET","/audio/{file-id:aa34d9c0-0553-4b1a-b376-188877d698bd}/","Download an audio clip","200,403,404:File not found or not an AUDIO_CLIP.,500,502",{bin:1}]]},
+
+{id:"video",t:"Video",g:0,c:"full",d:["Stream video (<code>video/h264</code>) for files of type VIDEO_CLIP using HTTP range requests."],
+ ep:[["GET","/video/{file-id:062d8c5b-1431-4da6-a9ff5366cee95546}/","Stream a video clip (partial content)","206:Partial content. Use the response's Content-Range: bytes=BEGIN-END/TOTAL to request the next chunk with Range: bytes=BEGIN-[END]. If END is omitted the server block size is used.,403,404:File not found.,500,502",{bin:1,hd:{"Range":"bytes=0-"}}]]},
+
+{id:"history",t:"History",g:0,c:"full",d:["Change history of a file, as an Atom feed of entries linking to VDF details."],
+ ep:[["GET","/histories/{file-id:aa34d9c0-0553-4b1a-b376-188877d698bd}/","History feed for a file","200,403,404:File not found.,500,502",{ln:L("history")}],
+  ["GET","/metadata/history/{file-id:AA34D9C0-0553-4B1A-B376188877D698BD}/{timestamp:2012-09-25T12:46:39Z}/","A single history entry (VDF)","200,403,404:Invalid history timestamp.,500,502",{}]],
+ f:["time|datetime|0|Date and time of the change","serial|string|0|Viz dongle id (if available)","user|integer|0|User identifier","changes|string|0|Description of the change","extra-info|string|0|Extra information from the changing application"]},
+
+{id:"addon-templates",t:"Templates & addons",g:0,c:"full",d:["Addon templates define custom metadata forms; addons are filled-in instances attached to files or folders. Templates are created dynamically (e.g. in Viz GH Manager), so the ids below are examples only."],
+ ep:[["GET","/templates","List addon templates (Atom feed)","200,403,404,500,502",{ln:L("addon template")}],
+  ["GET","/metadata/templates/","Metadata of all addon templates (VDF)","200,403,404,500,502",{}],
+  ["GET","/model/template/{template-id:7a19b2e6-5e83-4529-bae8-e34222ce2a0b}/","Model of one template (field definitions)","200,403,404:No template with that uuid.,500,502",{}],
+  ["POST","/metadata/addon/{entity-id:5246942c-293d-4701-a164-b881c5232ec5}/{template-id:7a19b2e6-5e83-4529-bae8-e34222ce2a0b}","Attach an addon to a file or folder","201:The response body is the new addon.,400:Invalid input — check value types and mandatory fields.,403,404,500",{ct:VDF,bf:"postaddon.xml",
+    b:`<payload ${NS}\n  model="HOST/model/template/7a19b2e6-5e83-4529-bae8-e34222ce2a0b">\n  <field name="entries">\n    <list>\n      <payload>\n        <field label="Gender" name="f0ae6bf5-6121-4e40-afbe-766273832cbf"><value>Female</value></field>\n        <field label="Title" name="99df274f-311c-4be5-86e2-4871be4a20cd"><value>Dr.</value></field>\n        <field label="First name" name="de948535-6fb6-41f8-8cdd-fcdae48ec522"><value>Jane</value></field>\n        <field label="Middle name" name="38ce3220-3519-4afc-9c8d-241080624d41"><value>Ann</value></field>\n        <!-- …one field per template entry, named by its uuid -->\n      </payload>\n    </list>\n  </field>\n</payload>`,
+    tp:["POST to the entity's <code>addon</code> link (see Files / Folders).","Field <code>name</code>s are the template entry uuids; <code>label</code> is optional and only for readability.","Required fields depend on the template."]}],
+  ["PUT","/metadata/addon/{entity-id:5246942c-293d-4701-a164-b881c5232ec5}/{template-id:7a19b2e6-5e83-4529-bae8-e34222ce2a0b}","Modify an addon","200:The response body is the modified addon.,400,403,404,500",{ct:VDF,bf:"putaddon.xml",tp:["Same body structure as the POST example. Addons can't be modified in batches."]}],
+  ["DELETE","/metadata/addon/{entity-id:5246942c-293d-4701-a164-b881c5232ec5}/{template-id:7a19b2e6-5e83-4529-bae8-e34222ce2a0b}","Remove one addon","204,400,403,404,500",{}],
+  ["DELETE","/addons/{entity-id:5246942c-293d-4701-a164-b881c5232ec5}/","Remove all addons from a file","204,400,403,404,500",{}]],
+ f:["id|uuid|0|Addon template identifier","name|string|0|Name","sort-id|integer|0|Sort identifier","stage-id|integer|0|Stage identifier","type-id|integer|0|Type identifier","modification-date|datetime|0|Last modification","modified-by|integer|0|User id of last modifier","comment|string|0|Template comment","version|string|0|Template version","group-id|uuid|0|Template group identifier","export-rule|integer|0|0 export+deploy · 1 export only · 2 deploy only · 9999 neither","entries||0|Dynamically generated list of template entries (named by uuid)|"]},
+
+{id:"template-groups",t:"Template & addon groups",g:0,c:"full",d:["Groups that organise addon templates. Created dynamically on the Graphic Hub."],
+ ep:[["GET","/templategroups","List template groups (Atom feed)","200,403,404,500,502",{ln:L("addon-template-group")}],
+  ["GET","/metadata/templategroup/{group-id:1a721886-c1ed-4e59-9cbc-88ea4d583b0e}/","Template group properties (VDF)","200,403,404:Invalid group id.,500,502",{}]],
+ f:["id|uuid|0|Template group identifier","name|string|0|Name","sort-id|integer|0|Sort identifier","parent-id|integer|0|Parent template group identifier"]},
+
+{id:"search",t:"Search",g:0,c:"full",d:["OpenSearch over files and folders. The description document lists all supported parameters; results come back as an Atom feed with a <code>next</code> link for pagination."],
+ ep:[["GET","/opensearchdescription/","OpenSearch description document","200,403,404,500,502",{tp:["<code>dtstart</code> only accepts dates after 1970-01-01T00:00:00Z; earlier values are ignored."]}],
+  ["GET","/search?searchTerms={searchTerms:test}&media={media:image}&startIndex={startIndex:1}&count={count:2}","Search files and folders","200,400:Invalid search query.,403,404,500,502",{ln:["next: Next page of results, if any.","up: Parent folder (or /data root).","self / describedby: The entry and its VDF properties.","controlmodel, history, addon: As for Files.","media:content / media:thumbnail: Image and thumbnail."],tp:["Pagination works best with Graphic Hub 2.3.2+."]}],
+  ["GET","/search?addons={addons:7A19B2E6-5E83-4529-BAE8-E34222CE2A0B;F0AE6BF5-6121-4E40-AFBE-766273832CBF;Male}","Search by addon field values","200,400,403,404,500,502",{tp:["Format: <code>addons=TEMPLATE-UUID;FIELD-UUID;Value</code> (URL-encode <code>;</code> as <code>%3B</code>).","Add more triples separated by a space or <code>+</code>; results match <i>any</i> of them.","When <code>addons</code> is set, all other parameters are ignored."]}]]},
+
+/* ---------- ADVANCED ---------- */
+{id:"sessions",t:"Sessions",g:1,c:"limited",d:["Active client sessions on the Graphic Hub."],
+ ep:[["GET","/sessions","List sessions (Atom feed)","200,403,404,500,502",{ln:L("session")}],
+  ["GET","/metadata/session/{session-id:1}/","Session properties (VDF)","200,403,404:Session not found or already removed.,500,502",{}]],
+ f:["id|integer|0|Session identifier","user-id|integer|0|User of the session","transaction-count|integer|0|Processed transactions (-2 = active transaction)","open-files|integer|0|File opens in this session","locked-files|integer|0|Locked files","login-time|datetime|0|Login time","last-activity|datetime|0|Last activity","host|string|0|Client IP address","application|string|0|Application name","priority|string|0|Session priority","access|string|0|Access mode","notification|string|0|Notification mode"]},
+
+{id:"server-checksum",t:"Server checksum",g:1,c:"limited",d:["Checksums of the whole server, folder tree and file data — useful for comparing replicated servers."],
+ ep:[["GET","/serverchecksum/","Server checksum (Atom feed)","200,403,404:Error retrieving the checksum.,500,502",{ln:L("server checksum"),tp:["Calling the metadata link directly is faster."]}],
+  ["GET","/metadata/serverchecksum/","Server checksums (VDF)","200,403,404,500,502",{tp:["This is a <b>very slow</b> operation — don't poll it frequently."]}]],
+ f:["global|string|0|Global server checksum","tree|string|0|Folder structure checksum","tree-and-file|string|0|Folder structure + file data checksum","file|string|0|File data checksum","file-reference|string|0|File data + references checksum"]},
+
+{id:"monitor",t:"Monitor",g:1,c:"limited",d:["Health and load data for the connected Graphic Hub: licensing, disk, memory, calls per second, cluster state."],
+ ep:[["GET","/monitor","Monitor data (Atom feed)","200,403,404:Couldn't query monitor data.,500,502",{ln:L("monitor"),tp:["Calling the metadata link directly is faster."]}],
+  ["GET","/metadata/monitor/","Monitor data (VDF)","200,403,404,500,502",{tp:["A slow operation — avoid polling too often."]}]],
+ f:["id|string|0|Server id ([GH name]@[HOST]:[PORT])","logins|integer|0|Logins since start","file-handles|integer|0|Used file handles","locked-files|integer|0|Locked files","files-open|integer|0|Currently open files","function-count|integer|0|Provided server functions","restart-recommended|boolean|0|Restart recommended","restart-necessary|boolean|0|Restart necessary","expire-days|integer|0|Days until license expiry (0 expired · -1 never · -5 5/4 free mode)","active-sessions|integer|0|Active sessions","deadlocks|integer|0|Detected deadlocks","file-opens|integer|0|File opens since start","file-count|integer|0|Number of files","files-memory|integer|0|Files held in memory","total-calls|integer|0|Server calls since start","available-mb|integer|0|Available disk (MB)","total-mb|integer|0|Total disk (MB)","free-mb|integer|0|Free disk (MB)","limit|integer|0|Disk warning limit (MB)","memory-used-percent|integer|0|Memory usage %","memory-total-mb|integer|0|Total memory (MB)","memory-free-mb|integer|0|Free memory (MB)","server-start-time|datetime|0|Server start time","calls-per-second|decimal|0|Current calls/s","peak-calls-per-second|decimal|0|Peak calls/s","calls-per-second-average|decimal|0|Average calls/s","peak-calls-per-second-average|decimal|0|Average peak calls/s","server-version|string|0|Server version","server-type|string|0|Server type","open-transactions|integer|0|Open transactions","cluster-connected|boolean|0|Connected to its replication partner","partner-id|string|0|Partner server id"]},
+
+{id:"monitor-functions",t:"Monitor functions",g:1,c:"limited",d:["Per-function call statistics of the Graphic Hub server."],
+ ep:[["GET","/monitorfunctions","Function stats (Atom feed)","200,403,404,500,502",{ln:L("monitor function")}],
+  ["GET","/metadata/monitorfunction/{function-id:2}/","Stats for one function (VDF)","200,403,404:Invalid function id.,500,502",{}]],
+ f:["id|integer|0|Function identifier","function-name|string|0|Function name","total-calls|integer|0|Processed calls","active-calls|integer|0|Active calls","total-returns|integer|0|Returned calls","active-returns|integer|0|Currently returning calls"]},
+
+{id:"journals",t:"Journals",g:1,c:"limited",d:["Journal (alert/log) entries written by applications to the Graphic Hub."],
+ ep:[["GET","/journals","List journal entries (Atom feed)","200,403,404,500,502",{ln:L("journal"),tp:["Calling the metadata link directly is faster."]}],
+  ["GET","/metadata/journals","All journal entries (VDF)","200,403,404,500,502",{}],
+  ["GET","/metadata/journal/{journal-id:DDA19901-658E-4B92-8DA06D5629130573}","One journal entry (VDF)","200,403,404:Invalid journal id.,500,502",{tp:["Journals are cached up to a maximum; only the newest are returned."]}]],
+ f:["journal-entries||0|Journal entries, newest first|id,date,application-id,application-name,alert-level,alert-subject,alert-description,system-id,data","id|uuid|0|Entry identifier","date|datetime|0|Creation time","application-id|uuid|0|Creating application id","application-name|string|0|Creating application name","alert-level|integer|0|Alert level","alert-subject|string|0|Alert subject","alert-description|string|0|Short description / possible solution","system-id|uuid|0|Related file or folder id","data|string|0|Detailed information"]},
+
+{id:"control-model",t:"Control model",g:1,c:"full",d:["The VDF model (<code>application/vnd.vizrt.model+xml</code>) describing a file's controllable fields."],
+ ep:[["GET","/controlmodel/{file-id:aa34d9c0-0553-4b1a-b376-188877d698bd}","Get a file's control model","200,403,404:No control model or invalid file uuid.,500,502",{}],
+  ["POST","/controlmodel/{file-id:AC2CEAE5-85E6-844B-BA6D5E53720D3F8E}","Create a control model (file must have none)","201,409:Control model already exists.,401,403,404,500,501:Content type doesn't match.",{ct:"application/vnd.vizrt.model+xml",bf:"postmodel.xml",b:`<?xml version="1.0" encoding="UTF-8"?>\n<model ${NS}>\n  <schema>\n    <fielddef name="1" label="ABC" mediatype="application/atom+xml;type=entry;media=image">\n      <container xmlns="http://www.vizrt.com/2011/bgfx" uuid="&lt;8ECE8F8E-8387-47A4-B929A34942CCA6DD&gt;" path="Jellyfish"/>\n      <value>\n        <entry xmlns="http://www.w3.org/2005/Atom">\n          <content type="application/vnd.vizrt.viz.image">IMAGE*/Scenes/Jellyfish</content>\n        </entry>\n      </value>\n    </fielddef>\n  </schema>\n</model>`}],
+  ["PUT","/controlmodel/{file-id:AC2CEAE5-85E6-844B-BA6D5E53720D3F8E}","Create or update a control model","200:Updated.,201:Created.,401,403,404,500,501:Content type doesn't match.",{ct:"application/vnd.vizrt.model+xml",bf:"putmodel.xml",tp:["Same body structure as the POST example."]}]]},
+
+{id:"login",t:"Login",g:1,c:"full",d:["Validate credentials <i>without</i> triggering the browser's built-in login dialog (no <code>WWW-Authenticate</code> response header). Handy for web front-ends."],
+ ep:[["GET","/gh/login/","Test a user/password combination","200:Credentials are valid on the connected Graphic Hub.,401:User or password not valid.",{tp:["The Viz-style scrambled password is also accepted inside the Basic header."]}]],
+ f:["WWW-Authenticate|string|0|The header value, for browser implementations that bypass the built-in auth window"]},
+
+{id:"gh-configuration",t:"GH configuration",g:1,c:"none",noauth:1,d:["Which Graphic Hub this REST server connects to, its timeouts and failover servers."],
+ ep:[["GET","/gh/configuration","GH configuration (Atom feed)","200,404,500,502",{ln:L("gh configuration"),tp:["No authentication required for GET."]}],
+  ["GET","/metadata/gh/configuration","GH configuration (VDF)","200,404,500,502",{tp:["No authentication required for GET."]}],
+  ["PUT","/metadata/gh/configuration/","Change GH connection settings","200,400,403,502:The newly configured Graphic Hub isn't running or reachable.,500",{ct:VDF,bf:"putghconfiguration.xml",
+    b:pl("gh/configuration",[fld("gh-server","VizDbServer"),fld("gh-service","MAIN_SERVER_HOST"),fld("gh-port","19396"),fld("gh-global-timeout","60"),fld("gh-connect-timeout","20"),fld("gh-chunk-size-multiplier","10"),`  <field name="gh-failover-servers">\n    <list>\n      <payload>\n        <field name="gh-failover-server"><value>VizDbServer</value></field>\n        <field name="gh-failover-namingservice"><value>FAILOVER_HOST</value></field>\n        <field name="gh-failover-port"><value>19396</value></field>\n      </payload>\n    </list>\n  </field>`].join("\n")),
+    tp:["Only send changed fields.","Failover servers are <b>not</b> validated — an invalid one can make GH REST unresponsive."]}]],
+ f:["gh-server|string|1|Graphic Hub server name","gh-service|string|1|Naming service (hostname)","gh-port|integer|1|Graphic Hub port","gh-global-timeout|integer|1|Global connection timeout","gh-connect-timeout|integer|1|Connect timeout","gh-buffer-multiplier|integer|1|Buffer multiplier of 51200 (1–20)","gh-chunk-size-multiplier|integer|1|Read chunk multiplier of 51200 (1–20)","gh-failover-servers||1|Failover servers|gh-failover-server,gh-failover-namingservice,gh-failover-port","gh-failover-server|string|1|Failover server name","gh-failover-namingservice|string|1|Failover naming service","gh-failover-port|integer|1|Failover port"]},
+
+{id:"gh-bindings",t:"GH REST bindings",g:1,c:"limited",d:["The set of GH REST servers registered with the Graphic Hub (Viz Engine reads these to discover REST endpoints)."],
+ ep:[["GET","/gh/relations","List bindings (Atom feed)","200,403,404,500,502",{ln:L("gh binding")}],
+  ["GET","/metadata/gh/relation/{rest-id:634CE5FD-447F-44B8-9A65742B50D47882}/","One binding (VDF)","200,403,404:Invalid binding id.,500,502",{}],
+  ["GET","/metadata/gh/relations/","All bindings (VDF)","200,403,404,500,502",{}],
+  ["PUT","/metadata/gh/relations/","Replace all bindings (batch only)","200,400,403,404,500",{ct:VDF,bf:"putghbinding.xml",
+    b:pl("gh/relations",`  <field name="relations">\n    <list>\n      <payload>\n${["rest-id|634CE5FD-447F-44B8-9A65742B50D47882","protocol|http","hostname|CURRENT_REST_HOSTNAME","port|80","service-doc-path|","service-doc-accept-type|application/atomsvc+xml"].map(s=>{const[a,b]=s.split("|");return "        "+fld(a,b).trim()}).join("\n")}\n      </payload>\n    </list>\n  </field>`),
+    tp:["Bindings can only be modified as a batch.","Never change a binding's <code>rest-id</code>.","The rest-id of this server is available from System configuration.","<b>Note:</b> the original docs spell this path <code>/metadata/gh/releations/</code> in the curl example; <code>relations</code> matches the GET endpoints."]}]],
+ f:["relations||1|All GH REST bindings on the Graphic Hub|rest-id,protocol,hostname,port,service-doc-path,service-doc-accept-type","rest-id|string|1|Unique id of the REST entry","protocol|string|1|Protocol","hostname|string|1|Hostname","port|integer|1|Port","service-doc-path|string|1|Path to the service document","service-doc-accept-type|string|1|Accept type for the service document"]},
+
+{id:"server-shutdown",t:"Server shutdown",g:1,c:"full",danger:1,d:["Read or trigger a graceful shutdown of the <b>connected Graphic Hub</b>."],
+ ep:[["GET","/gh/shutdown/","Shutdown state (VDF)","200,403,404,500",{}],
+  ["PUT","/gh/shutdown/","Shut down the Graphic Hub","200:Shutdown started.,400,403,404,500,502",{ct:VDF,bf:"putservershutdown.xml",rq:["server-shutdown"],b:pl("gh/shutdown",fld("server-shutdown","true")),
+    tp:["All further Graphic Hub requests are blocked until the server is started again."]}]],
+ f:["server-shutdown|boolean|1|Gracefully shut down the connected Graphic Hub"]},
+
+{id:"shutdown-task",t:"Shutdown task",g:1,c:"full",danger:1,d:["A scheduled (one-off or recurring) shutdown of the connected Graphic Hub. Create with POST, modify with PUT."],
+ ep:[["GET","/gh/task/shutdown/","Current shutdown task (VDF)","200,403,404:No shutdown task exists (POST to create one).,500",{}],
+  ["POST","/gh/task/shutdown/","Create a shutdown task","201,400,403,404,500,502",{ct:VDF,bf:"postshutdowntask.xml",rq:["task-enabled","task-mode","task-start","task-end","task-interval-seconds","task-notify"],
+    b:pl("gh/task/shutdown",[fld("task-enabled","true"),fld("task-mode","recurring_forever"),fld("task-start","2026-12-01T22:00:00Z"),fld("task-end","2027-12-01T22:00:00Z"),fld("task-interval-seconds","-2"),fld("task-notify","30")].join("\n"))}],
+  ["PUT","/gh/task/shutdown/","Modify the shutdown task","200,400,403,404:No shutdown task exists.,500",{ct:VDF,bf:"putshutdowntask.xml",rq:["task-enabled","task-mode","task-start","task-end","task-interval-seconds","task-notify"],
+    b:pl("gh/task/shutdown",[fld("task-enabled","false"),fld("task-mode","once"),fld("task-start","2026-12-18T21:00:00Z"),fld("task-end","2026-12-18T21:00:00Z"),fld("task-interval-seconds","180"),fld("task-notify","15")].join("\n"))}]],
+ f:["task-enabled|boolean|1|Task will (true) or won't (false) shut down the server","task-mode|string|1|once · recurring · recurring_forever","task-start|datetime|1|First run","task-end|datetime|1|Run until (recurring only)","task-interval-seconds|integer|1|Interval ≥ 180 s, or -1 monthly · -2 monthly ultimo · -3 quarterly · -5 half-yearly · -6 yearly · -7 quarterly ultimo","task-notify|integer|1|Chat notice minutes before shutdown: 0 (off), 5, 15, 30, 60"]},
+
+{id:"duplicates",t:"Duplicates",g:1,c:"full",d:["Find files with an identical checksum, or create a copy of a file."],
+ ep:[["GET","/duplicates/{checksum:13543141e9857d50d596826c92c10c80}","Files with the same checksum (Atom feed)","200,403,404,500,502",{ln:["self: The duplicate file entry.","describedby: Its VDF properties."]}],
+  ["POST","/duplicate","Duplicate a file","201:The response body is the new file.,400,403,404,500",{ct:VDF,bf:"createDuplicate.xml",rq:["source-file-id","source-folder-id"],
+    b:pl("",[fld("source-file-id","A2612664-07A2-4A15-AAA21ECC79D344A9"),fld("source-folder-id","CF96A7C0-1245-4D4F-8A224B126494339C"),fld("target-folder-id","E4287001-8486-C44D-809183FC5C98112E"),fld("target-name","MyDuplicate")].join("\n")),
+    tp:["Only target folder → keeps the original name.","Only target name → copy is placed in the source folder.","Both → exact folder and name."]}]],
+ f:["source-file-id|uuid|1|File to duplicate","source-folder-id|uuid|1|Folder the source file is in","target-folder-id|uuid|1|Destination folder","target-name|string|1|Name of the copy"]},
+
+{id:"commands",t:"Commands",g:1,c:"full",d:["Send a Viz command to a Viz Engine that's logged in to this Graphic Hub via GH REST. POST only; the command is a VDF payload."],
+ ep:[["POST","/command","Execute a Viz command","201,403,404,500,502",{ct:VDF,bf:"command.xml"}]]},
+
+{id:"archives",t:"Archives",g:1,c:"full",d:["Import a Viz Archive (<code>.via</code>) with its original structure. Size is limited by <code>max-content-size</code> in System configuration.","Large archives may time out client-side but still import correctly. Archives can't be uploaded in parallel and overwrite existing content."],
+ ep:[["POST","/archive/","Import a .via archive","201:Body contains upload information.,400:Invalid header or archive.,401,403,404,500",{up:"archive.via",ct:"application/octet-stream",tp:["Only importing into the <code>\\data</code> project is currently supported."]}]]},
+
+/* ---------- REST AGENT ---------- */
+{id:"rest-monitor",t:"Rest monitor",g:2,c:"none",d:["Health of the REST agent itself: version, CPU, memory, disks, network adapters."],
+ ep:[["GET","/restmonitor","REST monitor (Atom feed)","200,403,404,500,502",{ln:L("rest monitor")}],
+  ["GET","/metadata/restmonitor/","REST monitor data (VDF)","200,403,404,500,502",{tp:["<code>rest-version</code> is handy for client compatibility checks.","partitions, processors, cpu-usage and network-adapters are hardware-dependent lists."]}]],
+ f:["rest-version|string|0|REST agent version","rest-http-server|string|0|HTTP server name","rest-started|datetime|0|Start time","rest-http-server-version|string|0|HTTP server version","rest-http-server-wwwroot|string|0|wwwroot directory","partitions||0|Drives|partition-label,partition-name,partition-total-space-bytes,partition-free-space-bytes","processors||0|CPUs|processor-name,processor-description,processor-manufacturer,processor-cores,processor-logical-processors,processor-max-clock-mhz,processor-current-clock-mhz","cpu-usage||0|Per-core usage|cpu-kernel-core-id,cpu-kernel-core-percent","process-cpu-usage|integer|0|REST process CPU %","process-handles|integer|0|REST process handles","process-threads|integer|0|REST process threads","process-name|string|0|Process name","process-memory-usage-bytes|integer|0|REST process memory (bytes)","memory-total-mb|integer|0|Total memory (MB)","memory-free-mb|integer|0|Free memory (MB)","network-adapters||0|Network interfaces|network-adapter-name,network-adapter-mac,network-adapter-enabled,network-adapter-ip,network-adapter-speed-bits,network-adapter-usage-bytes"]},
+
+{id:"url-statistics",t:"URL statistics",g:2,c:"none",d:["Request statistics broken down by URL type (FILE, ADDON, …)."],
+ ep:[["GET","/urlstatistics/","URL statistics (Atom feed)","200,403,404,500,502",{ln:L("url statistics")}],
+  ["GET","/metadata/urlstatistics","URL statistics (VDF)","200,403,404,500,502",{}]],
+ f:["url-statistics||0|Per URL type|id,access-count,fail-count,success-count,remove-count,total-bytes,average-bytes,total-duration,average-duration,first-access,last-access,accessed-methods","id|string|0|URL type","access-count|integer|0|Accesses","fail-count|integer|0|Failed","success-count|integer|0|Succeeded","remove-count|integer|0|Removed transactions (≈ access-count unless busy)","total-bytes|integer|0|Bytes sent","average-bytes|integer|0|Bytes per request","total-duration|integer|0|Total processing time","average-duration|integer|0|Time per request","first-access|datetime|0|First access","last-access|datetime|0|Last access","accessed-methods||0|HTTP methods used|method-type,method-count"]},
+
+{id:"ip-statistics",t:"IP statistics",g:2,c:"none",d:["Request statistics broken down by client IP address."],
+ ep:[["GET","/ipstatistics","IP statistics (Atom feed)","200,403,404,500,502",{ln:L("ip statistic")}],
+  ["GET","/metadata/ipstatistics/","All IP statistics (VDF)","200,403,404,500,502",{}],
+  ["GET","/metadata/ipstatistic/{ip:127.0.0.1}/","Statistics for one IP (VDF)","200,403,404:Unknown IP.,500,502",{}]],
+ f:["id|string|0|Client IP address","login-failed|integer|0|Failed logins","access-count|integer|0|Accesses","fail-count|integer|0|Failed","success-count|integer|0|Succeeded","total-bytes|integer|0|Bytes sent","average-bytes|integer|0|Bytes per request","total-duration|integer|0|Total processing time","average-duration|integer|0|Time per request","first-access|datetime|0|First access","last-access|datetime|0|Last access","accessed-methods||0|HTTP methods used|method-type,method-count","accessed-uris||0|URL categories used|accessed-uris-uri,accessed-uris-count"]},
+
+{id:"general-statistics",t:"General statistics",g:2,c:"none",d:["Overall REST agent throughput: calls/s, bytes/s and totals."],
+ ep:[["GET","/generalstatistics/","General statistics (Atom feed)","200,403,404,500,502",{ln:L("general statistics")}],
+  ["GET","/metadata/generalstatistics","General statistics (VDF)","200,403,404,500,502",{tp:["Path inferred from the naming pattern — the original page omits the example."]}]],
+ f:["login-failed|integer|0|Failed logins","access-count|integer|0|Accesses","fail-count|integer|0|Failed","success-count|integer|0|Succeeded","total-bytes|integer|0|Bytes sent","average-bytes|integer|0|Bytes per request","total-duration|integer|0|Total processing time","average-duration|integer|0|Time per request","first-access|datetime|0|First access","last-access|datetime|0|Last access","calls-per-sec|decimal|0|Calls per second","bytes-per-sec|decimal|0|Bytes per second","bytes-per-call|decimal|0|Bytes per call","accessed-methods||0|HTTP methods used|method-type,method-count"]},
+
+{id:"licenses",t:"Licenses",g:2,c:"",d:["Third-party license information for the REST agent."],
+ ep:[["GET","/thirdpartylicense","Third-party licenses","200,403,404,500,502",{}]]},
+
+{id:"export",t:"Export",g:2,c:"",noauth:1,d:["Log files and diagnostic exports generated during the current runtime. Doesn't require a running Graphic Hub to authenticate against."],
+ ep:[["GET","/exports","List exports and logs (Atom feed)","200,500",{tp:["Download individual entries via <code>/feed/entry/link[@rel='self']/@href</code>."]}],
+  ["POST","/export","Generate a new export","201:The response body is the new export entry.,400,500",{ct:VDF,bf:"postexport.xml",b:pl("export",fld("generate","true"))}],
+  ["DELETE","/export/{export-id:806F4E6F-7C42-4B33-A1208798F8E49D95}/","Delete an export","204,403:Log files can't be deleted.,404,400,500",{}]],
+ f:["generate|boolean|1|Create an export of logs and dumps"]},
+
+/* ---------- REST CONFIG ---------- */
+{id:"system-configuration",t:"System configuration",g:3,c:"none",noauth:1,d:["Settings of the GH REST agent: logging, timeouts, search limits, image import defaults, upload limits and reverse proxy."],
+ ep:[["GET","/system/configuration","System configuration (Atom feed)","200,404,500,502",{ln:L("system configuration"),tp:["No authentication required for GET."]}],
+  ["GET","/metadata/system/configuration","System configuration (VDF)","200,404,500",{tp:["No authentication required for GET."]}],
+  ["PUT","/metadata/system/configuration/","Change REST agent settings","200,400:Invalid input (values are regex-validated).,403,404,500",{ct:VDF,bf:"putsystemconfiguration.xml",
+    b:pl("system/configuration",`  <field name="log-levels">\n    <list>\n      <payload>\n${["debug","trace","information","warning","error","critical"].map(l=>"        "+fld("log-level-"+l,l==="error"||l==="critical"?"true":"false").trim()).join("\n")}\n      </payload>\n    </list>\n  </field>\n${fld("search-default-max-count","100")}`),tp:["Only send changed fields."]}]],
+ f:["log-levels||0|Log levels|log-level-debug,log-level-trace,log-level-information,log-level-warning,log-level-error,log-level-critical,log-level-ace,log-level-hql","log-level-debug|boolean|1|Debug messages","log-level-trace|boolean|1|Trace messages (needs trace enabled)","log-level-information|boolean|1|Informational messages","log-level-warning|boolean|1|Warnings","log-level-error|boolean|1|Errors","log-level-critical|boolean|1|Critical messages","log-level-ace|boolean|1|Viz GH Interface ACE messages","log-level-hql|boolean|1|HQL queries, timing and errors","default-mime-type|string|1|Default mime type for internal templates","request-timeout-milliseconds|integer|1|Request timeout","no-of-sessions|integer|1|Sessions per user to the Graphic Hub","trace-requests|boolean|1|Trace requests (debug)","search-default-max-count|integer|1|Default max search results","journal-max-buffer|integer|1|Max journals buffered (0 = off)","journal-max-days|integer|1|Days of journals to retrieve (≥1)","hide-console|boolean|1|Hide the REST console","configured|boolean|1|GH REST is configured","default-image-compression|string|1|AUTO · NONE · DXT1 · DXT5","default-image-quality|string|1|LOW · MEDIUM · HIGH","num-parallel-images|integer|1|Max parallel image uploads (0 = memory-bound; >12 may slow down)","memory-usage-percent|integer|1|Max memory % for parallel image processing","max-content-size|integer|1|Max upload body size (MB)","reverse-proxy||0|Rewrite URLs in responses behind a proxy|reverse-proxy-enabled,reverse-proxy-protocol,reverse-proxy-prefix,reverse-proxy-host","reverse-proxy-enabled|boolean|1|Enable URL rewriting (default off)","reverse-proxy-protocol|string|1|http or https","reverse-proxy-prefix|string|1|Base path, must start with '/', not just '/'","reverse-proxy-host|string|1|host:port for responses (empty = Host header)","gh-relation-id|string|0|Unique id of this GH REST","gh-relation-protocol|string|0|Default protocol","gh-relation-hostname|string|0|Hostname","gh-relation-ip-addresses||0|All local IP addresses|gh-relation-ip-address","gh-relation-port|integer|0|Webserver port","gh-relation-service-doc-path|string|0|Service document path","gh-relation-service-doc-accept-type|string|0|Service document accept type"]},
+
+{id:"httpd-configuration",t:"HTTPD configuration",g:3,c:"none",noauth:1,danger:1,d:["Configuration of the embedded web server. <b>Changing it automatically restarts GH REST.</b>"],
+ ep:[["GET","/httpd/configuration","Webserver configuration (Atom feed)","200,404,500,502",{ln:L("webserver configuration"),tp:["No authentication required for GET."]}],
+  ["GET","/metadata/httpd/configuration","Webserver configuration (VDF)","200,404,500,502",{tp:["No authentication required for GET."]}],
+  ["PUT","/metadata/httpd/configuration/","Change webserver settings (restarts GH REST)","200,400,403,404,500",{ct:VDF,bf:"puthttpdconfiguration.xml",
+    b:pl("httpd/configuration",[fld("port","19398"),fld("thread-pool-size","32"),fld("use-keep-alive","true"),fld("socket-timeout-ms","5000"),fld("ssl","false")].join("\n")),tp:["Only send changed fields.","Triggers an automatic restart of GH REST."]}]],
+ f:["port|integer|1|Webserver port (default 19398)","base-dir|string|1|Webserver directory","config-dir|string|0|Config directory","upload-dir|string|1|Temp upload directory","document-root|string|0|Document root (HTML files)","error-log|string|1|Error log path","access-log|string|1|Access log path","default-index|string|0|Default index file","local-endpoint|string|1|Bind address (default 0.0.0.0)","config-file|string|1|GH REST XML config file","server-name|string|1|HTTP server name","log-dir|string|1|Log directory","thread-pool-size|integer|1|Simultaneous connections","use-keep-alive|boolean|1|Keep-alive handling","socket-timeout-ms|integer|1|Keep-alive socket timeout","ssl|boolean|1|Serve over HTTPS"]},
+
+{id:"restart",t:"Restart",g:3,c:"none",danger:1,d:["Gracefully restart GH REST (disconnects from the Graphic Hub and reloads configuration), optionally including the webserver."],
+ ep:[["GET","/system/restart","Restart status (VDF)","200,404,500,502",{}],
+  ["PUT","/system/restart","Restart GH REST","200,400,404,500,502:Bad gateway — check the Graphic Hub is running.",{ct:VDF,bf:"restart.xml",b:pl("system/restart",[fld("restart","true"),fld("webserver","true")].join("\n")),tp:["Requires authentication, so the configured Graphic Hub must be up."]}]],
+ f:["restart|boolean|1|Disconnect from the Graphic Hub and reload configuration","webserver|boolean|1|Also restart the webserver"]},
+
+{id:"shutdown",t:"Shutdown",g:3,c:"none",danger:1,d:["Gracefully shut down GH REST. It must be started again manually."],
+ ep:[["GET","/system/shutdown","Shutdown status (VDF)","200,404,500",{}],
+  ["PUT","/system/shutdown/","Shut down GH REST","200,400,403,404,500,502",{ct:VDF,bf:"shutdown.xml",b:pl("system/shutdown",fld("shutdown","true")),tp:["You'll have to start GH REST manually afterwards."]}]],
+ f:["shutdown|boolean|1|Gracefully shut down GH REST"]},
+
+/* ---------- DEPLOY ---------- */
+{id:"deploy-agents",t:"Deploy agents",g:4,c:"full",d:["Deploy agents configured on this GH REST server, with their runtime state. Add/remove agents through Deploy agent configuration."],
+ ep:[["GET","/deploy/agents","List deploy agents (Atom feed)","200,403,404,500,502",{ln:L("deployagent")}],
+  ["GET","/metadata/deploy/agent/{ip:127.0.0.1}","Deploy agent state (VDF)","200,403,404:Invalid deploy agent id.,500,502",{}]],
+ f:["ip-address|string|0|Agent IP (identifier)","host-name|string|0|Agent hostname","port-udp|integer|1|UDP port","port-tcp|integer|1|TCP port","event-log-level|string|1|Event log level","journal-log-level|string|1|Journal log level","log-same-log-level-buffer-amount|integer|1|Logs queued to prevent flooding","log-check-interval|integer|1|Log queue flush interval","sleep-in-ms-between-reconnect-tries|integer|1|Reconnect wait (ms)","no-of-reconnect-tries|integer|1|Reconnect attempts","timeout-in-ms-for-failover|integer|1|Failover timeout","logging-server|string|0|Logging server","data-directory|string|1|Data directory","deletion-warning-percent|integer|1|Pause task if this % of files would be deleted","deletion-warning-max-files|integer|1|Pause task if this many files would be deleted","ha-port-tcp|integer|1|High-availability TCP port","ha-partner|string|1|HA partner","ha-mode-current|string|0|Current HA mode","ha-mode-original|string|1|Configured HA mode","overwrite-files-if-newer|boolean|1|Always overwrite newer files","overwrite-creation-date|boolean|1|Overwrite newer creation dates","overwrite-modification-date|boolean|1|Overwrite newer modification dates","original-ddc-behaviour|boolean|1|Use GH Manager DDC behaviour","global-timeout-in-ms|integer|1|Global operation timeout","open-server-timeout-in-ms|integer|1|Server connect timeout","memory-total-mb|integer|0|Total memory","memory-free-mb|integer|0|Free memory","disk-total-mb|integer|0|Total disk","disk-free-mb|integer|0|Free disk","schedule-servers||1|Source servers for scheduling|server,namingservice,port,user","current-system-time|datetime|0|Agent clock","start-time|datetime|0|Agent start","amount-of-tasks-triggered|integer|0|Files triggered","amount-of-kb-successful-transfered|integer|0|KB transferred OK","amount-of-kb-not-successful-transfered|integer|0|KB failed","amount-of-files-successful-transfered|integer|0|Files transferred OK","amount-of-files-not-successful-transfered|integer|0|Files failed","ha-status|string|0|HA status","deploy-agent-version|string|0|Agent version","scheduler-version|string|0|vdbScheduler.dll version","vizdbi-version|string|0|VizDbI.dll version","actual-time|datetime|0|Actual time","is-paused|boolean|0|Agent paused","ha-configurable|string|0|HA configurable","network-interfaces||0|Network interfaces|ip-address"]},
+
+{id:"deploy-tasks",t:"Deploy tasks",g:4,c:"full",d:["Deploy tasks running on the configured agents, with live progress."],
+ ep:[["GET","/deploy/tasks","List deploy tasks (Atom feed)","200,403,404,500,502",{ln:L("deploytask")}],
+  ["GET","/metadata/deploy/task/{agent-ip:127.0.0.1}/{task-id:41E384C6-38BF-472F-BA1467C495ABE6E3}","Deploy task state (VDF)","200,403,404:Invalid deploy task id.,500,502",{}]],
+ f:["id|uuid|0|Task id","agent|string|0|Deploy agent","name|string|0|Task name","source-naming-service|string|0|Source naming service","source-server|string|0|Source server","start-time|datetime|0|Start time","task-range|integer|0|Files to process","task-position|integer|0|Files processed","is-paused|boolean|0|Paused","owner|integer|0|Owner user id","currently-paused|integer|0|Seconds currently paused","total-paused|integer|0|Seconds paused in total","deploy-task-type|string|0|Task type","deploy-task-state|string|0|Operation state","deploy-task-paused|string|0|Pause status","current-uuid|uuid|0|File in progress","current-name|string|0|File name in progress","current-server|string|0|Destination of current file","current-progress-percent|integer|0|Current file progress %","destination-server-statistics||0|Per destination server|server,bytes-succesful,bytes-not-succesful,current-position,range,time-started"]},
+
+{id:"deploy-configuration",t:"Deploy agent configuration",g:4,c:"full",d:["Register, modify and remove deploy agents on this GH REST server."],
+ ep:[["GET","/deploy/configurations","List agent configurations (Atom feed)","200,403,404,500,502",{ln:L("deploy-configuration")}],
+  ["GET","/metadata/deploy/configuration/{ip:127.0.0.1}","Agent configuration (VDF)","200,403,404:Invalid deploy agent id.,500,502",{}],
+  ["POST","/deploy/configuration/{ip:127.0.0.3}","Add a deploy agent","201,400:Invalid input or IP already exists.,403,404,500",{ct:VDF,bf:"postdeployagent.xml",rq:["ip-address"],
+    b:pl("deploy/configuration",[fld("ip-address","127.0.0.3"),fld("port","19393"),fld("connect-timeout-ms","5000"),fld("send-timeout-ms","5000"),fld("reconnect-interval-ms","10000")].join("\n"))}],
+  ["PUT","/metadata/deploy/configuration/{ip:127.0.0.3}","Modify a deploy agent","200,400,403,404,500",{ct:VDF,bf:"putdeployagent.xml",rq:["ip-address"],
+    b:pl("deploy/configuration",[fld("ip-address","127.0.0.3"),fld("connect-timeout-ms","7000"),fld("send-timeout-ms","7000"),fld("reconnect-interval-ms","20000")].join("\n"))}],
+  ["DELETE","/deploy/configuration/{ip:127.0.0.3}","Remove a deploy agent","200,204,403,404,400,500",{}]],
+ f:["ip-address|string|0|Agent IP (identifier)","port|integer|0|Agent port","connect-timeout-ms|integer|0|Connect timeout (ms)","send-timeout-ms|integer|0|Send/receive timeout (ms)","reconnect-interval-ms|integer|0|Reconnect interval (ms)"]}
+
+];
+/* ======================= PILOT DATA SERVER ======================= */
+const PDS_GROUPS=["Collections","Collection entries","Service & discovery"];
+const ATOM_FEED="application/atom+xml;type=feed",ATOM_ENTRY="application/atom+xml;type=entry";
+const ELEMENT_PAYLOAD=(id,title,line2)=>`<entry xmlns="http://www.w3.org/2005/Atom">${id?`\n  <id>${id}</id>`:""}\n  <title>${title}</title>\n  <content type="application/vnd.vizrt.payload+xml">\n    <payload xmlns="http://www.vizrt.com/types" model="HOST/templates/10003/model">\n      <field name="-concept-variant-choice">\n        <field name="concept"><value>News</value></field>\n        <field name="variant"><value>Lower</value></field>\n      </field>\n      <field name="01">\n        <value>Bob the Builder</value>\n        <field name="kerning"><value>0</value></field>\n      </field>\n      <field name="02">\n        <value>${line2}</value>\n        <field name="kerning"><value>0</value></field>\n      </field>\n    </payload>\n  </content>\n</entry>`;
+const PDS_RES=[
+{id:"pds-templates",t:"Template Collection",g:0,d:["All templates stored in the Pilot Data Server, as an Atom feed with one entry per template. Its URI is listed in the Service Document."],
+ ep:[["GET","/templates?concept={concept:1}&templatekind={templatekind:VideoWallPreset}","List templates, optionally filtered by concept and kind","200",{hd:{Accept:"application/atom+xml"},
+    tp:["Both filters are optional — <code>GET /templates</code> returns everything.","Each <code>//atom:feed/atom:entry</code> is a <a href=\"#pds-template-entry\">Template entry</a>."],
+    x:{"templatekind values":["PilotGraphicTriopage","PilotGraphicPayload","VideoWallPreset"]},
+    ln:["suggested-thumbnail: The suggested thumbnail image, if any (differs from media:thumbnail when the template has a concept).","alternate: The template model — object-based templates only.","updatescript: The template's update script — only when it has one.","thumbnailfeed: Not implemented.","media:thumbnail: Thumbnail image.","vaext:pilotdbid: The template's id in the database."]}],
+  ["POST","/templates?templatekind={templatekind:VideoWallPreset}","Create a template entry","200:The server returns a reference to the new entry (atom entry).",{ct:"application/atom+xml",bf:"template.xml",
+    b:`<entry xmlns="http://www.w3.org/2005/Atom">\n  <title type="text">MyExampleTemplate</title>\n  <concept type="text" xmlns="http://www.vizrt.com/atom-ext">1</concept>\n  <variant type="text" xmlns="http://www.vizrt.com/atom-ext">1</variant>\n</entry>`,
+    tp:["Minimum: a <code>title</code> and a valid <code>concept</code> id.","<code>templatekind</code> sets the type of template being created.","The original docs show <code>Content-Type: application/atom-xml</code>; the standard Atom type is used here."]}]]},
+
+{id:"pds-elements",t:"Data Element Collection",g:0,d:["All data elements stored in the Pilot Data Server. Referenced from the Service Document and from each template entry via <code>link rel=\"elements\"</code>."],
+ ep:[["GET","/dataelements?templatekind={templatekind:VideoWallPreset}&templatekind=PilotGraphicPayload","List data elements, optionally filtered by template kind","200",{hd:{Accept:"application/atom+xml"},
+    tp:["Repeat <code>templatekind</code> to match several kinds. Omit it to list every element."],
+    ln:["thumbnail: Thumbnail generator — renders on request or returns a cached image.","thumbnailfeed: Not implemented."]}],
+  ["POST","/dataelements","Create a data element from a VDF payload","200",{ct:"application/vnd.vizrt.payload+xml",bf:"element.xml",b:ELEMENT_PAYLOAD("","New data element description","Using REST API"),hd:{Accept:ATOM_ENTRY},
+    tp:["The payload's <code>model</code> attribute must point at an existing template model — take it from a template's <code>content</code> or <code>alternate</code> link.","The response's <code>content</code> holds the payload as stored, which may differ from what you sent."],
+    ln:["alternate: The element's VDF payload.","content: The element's VDF payload after the server has applied your POST."]}]]},
+
+{id:"pds-external-ids",t:"External ID Collection",g:0,d:["Every element that has an external id. External ids are set at the variant level of a template in Viz Template Wizard."],
+ ep:[["GET","/external_ids","List elements that have external ids","200",{hd:{Accept:"application/atom+xml"},tp:["Entries are <a href=\"#pds-element-entry\">Data Element</a> entries."]}]]},
+
+{id:"pds-images",t:"Image Collection",g:0,d:["All images stored in the Pilot Data Server. New images are ingested by POSTing to this collection; the docs don't describe the upload format.","Find its URI in the Service Document: <code>//app:collection[app:categories/atom:category[@term='asset']]/@href</code>. It supports OpenSearch."],
+ ep:[["GET","/{image-collection-path:IMAGE_COLLECTION}","List images","200",{hd:{Accept:"application/atom+xml"},
+    tp:["Replace the path with the image collection's href from your Service Document — the server I checked doesn't list one (images aren't configured there)."],
+    ln:["describedby: Payload with the image's metadata.","person: Atom entry for the person the picture shows."]}]]},
+
+{id:"pds-persons",t:"Person Collection",g:0,d:["All persons registered in the Pilot Data Server. Find its URI in the Service Document: <code>//app:collection[app:categories/atom:category[@term='person']]/@href</code>."],
+ ep:[["GET","/{person-collection-path:PERSON_COLLECTION}","List persons","200",{hd:{Accept:"application/xml"},
+    tp:["Replace the path with the person collection's href from your Service Document."],ln:["describedby: Payload with information about the person (same as the entry content)."]}],
+  ["GET","/vos/open_search/persons","OpenSearch description for persons","200",{hd:{Accept:"application/opensearchdescription+xml"},tp:["Linked from the Service Document with <code>rel=\"search\"</code>."]}]]},
+
+{id:"pds-tags",t:"Tag Collection",g:0,d:["All tags registered in the Pilot Data Server."],
+ ep:[["GET","/tags","List tags","200",{hd:{Accept:"application/atom+xml"},tp:["Entries are <a href=\"#pds-tag-entry\">Tag entries</a>."]}]]},
+
+{id:"pds-changelog",t:"Changelog Collection",g:0,d:["Recent inserts, updates and deletes in the database.","The changelog only keeps the recent past — expect old entries to be purged."],
+ ep:[["GET","/changelog","List recent changes (paged)","200",{hd:{Accept:"application/atom+xml"},
+    ln:["first / next: Paging links; next is only present when there are more pages.","monitor: STOMP subscription URL for live change notifications (not present in paged feeds)."],
+    tp:["Entry content type: <code>application/vnd.vizrt.changelogentry+xml</code>."]}]],
+ f:["operation|string|0|insert, update or delete","resource|string|0|template, element, scene_info or external_id","pilotdbid|integer|0|Internal id of the resource","id|string|0|Unique id of the resource"]},
+
+{id:"pds-template-entry",t:"Template",g:1,d:["Metadata describing one template, including its VDF model. Linked from each Data Element entry.","<code>templatekind</code> is one of PilotGraphicTriopage, PilotGraphicPayload or VideoWallPreset."],
+ ep:[["GET","/templates/{template-id:10003}","Get a template entry","200",{hd:{Accept:ATOM_ENTRY},
+    ln:["elements: Feed of the data elements based on this template.","alternate: The template's VDF model (application/vnd.vizrt.model+xml).","content: The model inlined — generated model merged with any model authored in Template Builder.","generatedmodel: The model generated from the template only."],
+    x:{"Useful XPaths":["//atom:entry/atom:title","//atom:entry/atom:updated","//atom:entry/atom:link[@rel='elements']/@href","//atom:entry/atom:link[@rel='alternate']/@href","//atom:entry/atom:content"]}}],
+  ["GET","/templates/{template-id:10003}/model","Get the template's VDF model","200",{hd:{Accept:"application/vnd.vizrt.model+xml"},tp:["This is the URL to use as the <code>model</code> attribute when creating elements."]}]]},
+
+{id:"pds-element-entry",t:"Data Element",g:1,d:["A single data element. It's the <code>self</code> link of an entry in the Data Element Collection feed."],
+ ep:[["GET","/dataelements/{element-id:2}","Get a data element","200",{hd:{Accept:ATOM_ENTRY},ln:["template: The template this element belongs to.","content: Payload with values for the template's fields."]}],
+  ["PUT","/dataelements/{element-id:2}","Update a data element","200:Updated.",{ct:"application/vnd.vizrt.payload+xml;type=element",bf:"element.xml",b:ELEMENT_PAYLOAD("2","Updated title","Updated using REST API")}],
+  ["DELETE","/dataelements/{element-id:2}","Delete a data element","204:Deleted.",{}]]},
+
+{id:"pds-image-entry",t:"Image",g:1,d:["One image and its metadata, reached from the Image Collection feed.","<code>//atom:entry/atom:link[@rel='describedby']/@href</code> → VDF payload with the image's metadata.","<code>//atom:entry/atom:content/@src</code> → the binary image data."],ep:[]},
+
+{id:"pds-tag-entry",t:"Tag",g:1,d:["One tag. <code>title</code> is its name; <code>vaext:count</code> is the number of templates that use it."],
+ ep:[["GET","/tags/{tag-id:1}","Get a tag entry","200",{hd:{Accept:ATOM_ENTRY},tp:["Entry URLs come from the Tag Collection feed; the path here is an example."]}]]},
+
+{id:"pds-service",t:"Service Document",g:2,d:["The starting point: an Atom Service Document (RFC 5023) at <code>/service</code> on port 8177, e.g. <code>http://pdshost.example:8177/service</code>. It lists every collection, VCP settings and the URL templates used by the Media Sequencer."],
+ ep:[["GET","/service","Discover collections and settings","200",{hd:{Accept:"application/atomsvc+xml"},
+    ln:["collection: href of each collection's Atom feed, identified by vizrt:type or category term.","vcp_settings: Payload listing configured VCP parameters.","search_providers: Payload listing asset search providers and authenticated hosts.","search: OpenSearch description (image and person collections).","other: Extra links appear when preview_server_uri, timeline_update_service or script_runner_uri are configured.","resolve: URL templates used by the Media Sequencer.","Url rel=changelist: CSV of element ids changed within N days."],
+    x:{"vizrt:type values":["templates","elements","concepts","external_ids","tags","webapp","videowallpreset","videowallfilledpreset","changelog"]},
+    tp:["Pick a collection with e.g. <code>//app:collection[@vizrt:type='templates']/@href</code> (namespace <code>http://www.vizrt.com/xmlns/types</code>)."]}],
+  ["GET","/vcp/parameters","Configured VCP parameters","200",{hd:{Accept:"application/vnd.vizrt.payload+xml"}}],
+  ["GET","/vcp/searchproviders?verify={verify:false}","Asset search providers and authenticated hosts","200",{hd:{Accept:"application/vnd.vizrt.payload+xml"}}],
+  ["GET","/concepts","Concept collection","200",{hd:{Accept:"application/atom+xml"},tp:["Listed in the live Service Document but not described in the docs."]}]]},
+
+{id:"pds-resolve",t:"Resolve templates",g:2,d:["URL templates from the Service Document's <code>&lt;resolve&gt;</code> elements, used by the Media Sequencer. The server marks all of them <b>deprecated</b>; they aren't described in the documentation pages."],
+ ep:[["GET","/dataelements/{elementid:2}/dataxml","Element as VDOM element XML","200",{hd:{Accept:"application/vnd.vizrt.vdomelement+xml"}}],
+  ["GET","/templates/{templateid:10003}/master_template_mse_format","Template as MSE master template","200",{hd:{Accept:"application/vnd.vizrt.vdommastertemplate+xml"}}],
+  ["GET","/scene_info/{sceneinfoid:1}","Scene info","200",{hd:{Accept:"application/vnd.vizrt.sceneinfo+xml"}}],
+  ["GET","/dataelements/{objid:2}/mosxml","Element as MOS object","200",{hd:{Accept:"application/vnd.vizrt.mosobj+xml"}}],
+  ["GET","/external_ids/{extid:EXT123}/msexml","External id as VDOM XML","200",{hd:{Accept:"application/vnd.vizrt.vdomextid+xml"}}],
+  ["GET","/changelist?days={days:1}","CSV of element ids changed in the last N days","200",{hd:{Accept:"text/csv"}}]]}
+];
+
+const API={
+  gh:{name:"Viz Graphic Hub",sub:"REST API reference · v2.5",res:GH_RES,groups:GH_GROUPS,auth:true,base:"http://127.0.0.1:19398",first:"folders"},
+  pds:{name:"Pilot Data Server",sub:"REST API reference",res:PDS_RES,groups:PDS_GROUPS,auth:false,base:"http://localhost:8177",first:"pds-templates"}
+};
+let RES=GH_RES,GROUPS=GH_GROUPS;
+
+const CODE_TXT={200:"OK",201:"Created",204:"No content",206:"Partial content",400:"Bad request — invalid input",401:"Unauthorized — missing or invalid credentials",403:"Forbidden — the user lacks required privileges",404:"Not found",409:"Conflict",500:"Server error",501:"Not implemented",502:"Bad gateway — can't reach the Graphic Hub, or it isn't running"};
+const CLUSTER={full:["Cluster ✓","full","Fully compatible with a GH REST cluster, including multiple synchronised Graphic Hubs."],limited:["Cluster: single GH","limited","Works in a cluster only when every node is connected to the same Graphic Hub."],none:["Not cluster-safe","none","Doesn't work through a cluster — call this server's absolute URL directly."]};
+const CHANGELOG=[["2.5.0 → 2.5.1",["Files in folder listings use the link name as title instead of the file name."]],["2.3.0 → 2.4.0",["Response Content-Type headers now report the correct type.","Controlmodel links only included when a control model exists.","Host and port configurable for reverse proxy."]],["2.2.0 → 2.3.0",["Folder up-link added to search and translator; up-link on 0-ID returns /data root.","Addon link on folders, search and translator.","next link for search pagination.","Down-links of single folders report the correct sub-folder count."]],["2.0.3 → 2.1.0",["Archives: POST /archive for importing small archives."]],["2.0 → 2.0.1",["process-memory-limit, reverse proxy, max content size and parallel upload settings in REST configuration.","Configuration input validated by regex.","Monitor endpoint without authentication.","Report exports endpoint."]],["1.1.2 → 2.0",["Versions endpoint.","Thumbnails accessible without authentication.","Change of folder/project owner.","ssl field for HTTPS.","Third-party license endpoint."]],["1.1 → 1.1.2",["Original checksum and expiration date properties.","File feed accepts a main folder id."]],["1.0.1 → 1.1",["gh-buffer-multiplier / gh-chunk-size-multiplier.","Rights lists no longer nested.","More HTTPD configuration fields.","History template renamed to /histories/{uuid}.","VIDEO_CLIP type and /video endpoint.","Deploy agents, tasks and configuration.","Template & addon groups."]],["1.0 → 1.0.1",["Empty collections return an empty feed with 200 instead of 404.","Regex on name fields; folder thr:count and up links; folder owner → owner-id."]]];
+
+/* ============================== STATE ============================== */
+const S={api:"gh",bases:{gh:"http://127.0.0.1:19398",pds:"http://localhost:8177"},user:"Admin",pass:"VizDb",lang:"curl",params:{}};
+try{const s=JSON.parse(localStorage.getItem("vizgh-docs")||"{}");if(s.bases)Object.assign(S.bases,s.bases);delete s.bases;delete s.base;Object.assign(S,s);}catch(e){}
+const save=()=>{try{localStorage.setItem("vizgh-docs",JSON.stringify({bases:S.bases,user:S.user,lang:S.lang,api:S.api}))}catch(e){}};
+const LANGS=[["curl","cURL"],["js","JavaScript"],["py","Python"],["ps","PowerShell"]];
+const b64=s=>{try{return btoa(unescape(encodeURIComponent(s)))}catch(e){return""}};
+const auth=()=>"Basic "+b64(S.user+":"+S.pass);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const base=()=>S.bases[S.api].replace(/\/+$/,"");
+
+/* path template helpers: {name:sample} */
+const PRX=/\{([^}:]+):([^}]*)\}/g;
+const pName=(r,i,n)=>r.id+"|"+i+"|"+n;
+function fillPath(r,i,p){return p.replace(PRX,(_,n,v)=>{const k=pName(r,i,n);return S.params[k]!=null?S.params[k]:v})}
+function showPath(p){return esc(p.replace(PRX,"\u0001$1\u0002")).replace(/\u0001([^\u0002]*)\u0002/g,'<span class="p">{$1}</span>')}
+function encodeUrlPath(u){return u.replace(/;/g,"%3B")}
+
+/* ============================== CODE GEN ============================== */
+function gen(r,i,lang){
+  const [m,p,,,o]=r.ep[i];const url=base()+encodeUrlPath(fillPath(r,i,p));
+  const needAuth=API[S.api].auth&&(!r.noauth||m!=="GET");const a=auth();
+  const hasBody=!!(o.b||o.bf);const bin=o.up;const ct=o.ct;
+  const hd=Object.assign({},o.hd||{});
+  if(lang==="curl"){
+    const L=[`curl${m!=="GET"?" --request "+m:""} "${url}"`];
+    if(needAuth)L.push(`  --header "Authorization: ${a}"`);
+    if(ct)L.push(`  --header "Content-Type: ${ct}"`);
+    for(const k in hd)L.push(`  --header "${k}: ${hd[k]}"`);
+    if(hasBody)L.push(`  --data-binary @${o.bf}`);
+    if(bin)L.push(`  --data-binary @${bin}`);
+    if(o.bin)L.push(`  --output ${p.includes("thumbnail")?"thumb.jpg":p.includes("video")?"chunk.h264":p.includes("audio")?"clip.wav":"image.jpg"}`);
+    let out=L.join(" \\\n");
+    if(!o.bin)out+="\n# optional: pipe through  | tidy -xml -i -w 0  to pretty-print";
+    return out;
+  }
+  if(lang==="js"){
+    const h=[];if(needAuth)h.push(`    Authorization: "${a}"`);if(ct)h.push(`    "Content-Type": "${ct}"`);for(const k in hd)h.push(`    "${k}": "${hd[k]}"`);
+    let pre="";if(hasBody)pre=`const body = \`${(o.b||"<!-- "+o.bf+" -->").replace(/HOST/g,base()).replace(/`/g,"\\`")}\`;\n\n`;
+    if(bin)pre=`// e.g. from <input type="file">\nconst body = fileInput.files[0];\n\n`;
+    const read=o.bin?`const blob = await res.blob();\nconst objectUrl = URL.createObjectURL(blob);`:`const xml = new DOMParser().parseFromString(await res.text(), "application/xml");\nconsole.log(xml);`;
+    return `${pre}const res = await fetch("${url}", {\n  method: "${m}",\n  headers: {\n${h.join(",\n")}\n  }${hasBody||bin?",\n  body":""}\n});\nif (!res.ok) throw new Error(\`HTTP \${res.status}\`);\n${read}`;
+  }
+  if(lang==="py"){
+    const h=[];if(ct)h.push(`"Content-Type": "${ct}"`);for(const k in hd)h.push(`"${k}": "${hd[k]}"`);
+    let pre="import requests\n\n";
+    if(hasBody)pre+=`body = """${(o.b||"<!-- "+o.bf+" -->").replace(/HOST/g,base())}"""\n\n`;
+    const args=[`"${m}"`,`"${url}"`];
+    if(needAuth)args.push(`auth=("${S.user}", "${S.pass.replace(/"/g,'\\"')}")`);
+    if(h.length)args.push(`headers={${h.join(", ")}}`);
+    if(hasBody)args.push(`data=body.encode("utf-8")`);
+    if(bin)args.push(`data=open("${bin}", "rb")`);
+    const tail=o.bin?`\nwith open("output.bin", "wb") as f:\n    f.write(res.content)`:`\nprint(res.text)`;
+    return `${pre}res = requests.request(\n    ${args.join(",\n    ")}\n)\nres.raise_for_status()${tail}`;
+  }
+  if(lang==="ps"){
+    const h=[];if(needAuth)h.push(`  Authorization = "${a}"`);for(const k in hd)h.push(`  "${k}" = "${hd[k]}"`);
+    const L=[`$headers = @{\n${h.join("\n")}\n}`];
+    let call=`Invoke-WebRequest -Uri "${url}" -Method ${m[0]+m.slice(1).toLowerCase()} -Headers $headers`;
+    if(ct)call+=` \`\n  -ContentType "${ct}"`;
+    if(hasBody)call+=` \`\n  -InFile ".\\${o.bf}"`;
+    if(bin)call+=` \`\n  -InFile ".\\${bin}"`;
+    if(o.bin)call+=` \`\n  -OutFile ".\\output.bin"`;
+    L.push((o.bin?"":"$res = ")+call);
+    if(!o.bin)L.push("[xml]$res.Content");
+    return L.join("\n");
+  }
+}
+function hl(code,lang){
+  let s=esc(code);
+  const toks=[];const keep=(re,cls)=>{s=s.replace(re,m=>{toks.push(`<span class="${cls}">${m}</span>`);return`\u0000${toks.length-1}\u0000`})};
+  if(lang==="xml"){keep(/&lt;!--[\s\S]*?--&gt;/g,"tk-c");keep(/"[^"\n]*"/g,"tk-s");keep(/&lt;\/?[\w:-]+/g,"tk-k");keep(/\/?&gt;/g,"tk-k");keep(/\b[\w:-]+(?==)/g,"tk-a");}
+  else{
+    keep(/"""[\s\S]*?"""|`[\s\S]*?`|"(?:[^"\\\n]|\\.)*"/g,"tk-s");
+    keep(/(^|[ \t])(#|\/\/)[^\n]*/gm,"tk-c");
+    if(lang==="curl")keep(/(--[\w-]+)/g,"tk-k");
+    if(lang==="js")keep(/\b(const|await|new|if|throw|return)\b/g,"tk-k");
+    if(lang==="py")keep(/\b(import|with|as|open|print)\b/g,"tk-k");
+    if(lang==="ps")keep(/\$\w+|-\w+(?=\s)/g,"tk-k");
+    keep(/\b(curl|fetch|requests|Invoke-WebRequest|DOMParser|URL)\b/g,"tk-f");
+  }
+  while(/\u0000\d+\u0000/.test(s))s=s.replace(/\u0000(\d+)\u0000/g,(_,n)=>toks[n]);
+  return s;
+}
+function codeBlock(title,code,lang,extraCls=""){
+  return `<div class="cb ${extraCls}"><div class="cb-h"><span>${esc(title)}</span><button class="copy" data-copy>Copy</button></div><pre data-raw="${esc(code)}">${hl(code,lang)}</pre></div>`;
+}
+
+/* ============================== RENDER ============================== */
+const $=s=>document.querySelector(s);const content=$("#content");
+
+function renderOverview(){
+  if(S.api==="pds")return renderPdsOverview();
+  return `<section id="overview" style="scroll-margin-top:70px">
+  <h1>Viz Graphic Hub REST API</h1>
+  <p class="lead">An Atom/AtomPub + VDF interface over HTTP for browsing and editing a Viz Graphic Hub — folders, files, users, addons, search, monitoring and deploy agents. Set your server and credentials in the bar above and every example on this page updates.</p>
+  <div class="grid">
+    <div class="card"><h4>1 · Discover</h4><p>Start from the Service Document at <code>/</code>; it links to every collection.</p></div>
+    <div class="card"><h4>2 · Navigate</h4><p>Collections are Atom feeds. Follow <code>rel="describedby"</code> for VDF properties and <code>rel="down"</code> to descend folders.</p></div>
+    <div class="card"><h4>3 · Edit</h4><p>POST/PUT VDF payloads (<code>application/vnd.vizrt.payload+xml</code>). Send only fields you change.</p></div>
+  </div>
+
+  <h3>Authentication</h3>
+  <p>All resources use HTTP Basic auth with your Graphic Hub user and password (RFC 2617). Some operations need administrative rights.</p>
+  <div class="kv" style="margin:6px 0 4px"><dt>Request</dt><dd id="authHeader"></dd><dt>Challenge</dt><dd>WWW-Authenticate: Basic realm="VizGraphicHub"</dd><dt>401</dt><dd>missing or invalid credentials</dd><dt>403</dt><dd>insufficient permissions</dd></div>
+  <p class="note">Building a web front-end? Use <a href="#login">GET /gh/login/</a> to validate credentials without triggering the browser's login popup.</p>
+
+  <h3>Content types</h3>
+  <div class="kv">
+    <dt>application/atomsvc+xml</dt><dd>Atom Service Document — entry point (RFC 5023)</dd>
+    <dt>application/atom+xml;type=feed</dt><dd>Collections (RFC 4287)</dd>
+    <dt>application/atom+xml;type=entry</dt><dd>Single entries</dd>
+    <dt>application/vnd.vizrt.payload+xml</dt><dd>VDF — editable properties (name/value fields)</dd>
+    <dt>application/vnd.vizrt.model+xml</dt><dd>VDF model — describes how to read a VDF payload</dd>
+    <dt>image/jpeg · audio/* · video/h264</dt><dd>Binary media</dd>
+  </div>
+  <h3>VDF in one glance</h3>
+  ${codeBlock("payload.xml",`<?xml version='1.0' encoding='utf-8'?>\n<payload xmlns="http://www.vizrt.com/types">\n  <field name="foo"><value>bar</value></field>\n  <field name="otherfoo"><value>otherbar</value></field>\n</payload>`,"xml")}
+  <h3>XML namespaces</h3>
+  <div class="kv"><dt>viz</dt><dd>http://www.vizrt.com/atom</dd><dt>vizgh</dt><dd>http://www.vizrt.com/atom-vizgh</dd><dt>app</dt><dd>http://www.w3.org/2007/app</dd><dt>VDF</dt><dd>http://www.vizrt.com/types</dd><dt>atom</dt><dd>http://www.w3.org/2005/Atom</dd></div>
+
+  <h3>Clustering</h3>
+  <p>GH REST can run as a load-balanced, failover cluster. Each resource is tagged:</p>
+  <div class="chips" style="gap:8px">${Object.values(CLUSTER).map(c=>`<span class="pill ${c[1]}" title="${c[2]}">${c[0]}</span> <span style="font-size:13px;color:var(--mute);margin-right:12px">${c[2]}</span>`).join("<br>")}</div>
+
+  <h3>Status codes</h3>
+  <div class="codes">${Object.entries(CODE_TXT).map(([k,v])=>`<div class="code-row"><b class="c${k[0]}">${k}</b><span>${v}</span></div>`).join("")}</div>
+  <p style="color:var(--mute);font-size:13px">Empty collections return an empty feed with <b>200</b> (not 404) since 1.0.1.</p>
+
+  <h3>Changelog</h3>
+  <div class="changelog">${CHANGELOG.map(([v,l],i)=>`<details${i===0?" open":""}><summary>${v}</summary><ul>${l.map(x=>`<li>${x}</li>`).join("")}</ul></details>`).join("")}</div>
+  </section>`;
+}
+
+function renderPdsOverview(){
+  return `<section id="overview" style="scroll-margin-top:70px">
+  <h1>Pilot Data Server REST API</h1>
+  <p class="lead">The Pilot Data Server (PDS) exposes templates, data elements, tags, images, persons and a changelog as Atom feeds, with VDF payloads for element content. Start at the Service Document and follow links.</p>
+  <div class="grid">
+    <div class="card"><h4>1 · Discover</h4><p><code>GET /service</code> lists every collection, identified by <code>vizrt:type</code> or category term.</p></div>
+    <div class="card"><h4>2 · Browse</h4><p>Templates link to their elements (<code>rel="elements"</code>); elements link back to their template.</p></div>
+    <div class="card"><h4>3 · Create & edit</h4><p>POST/PUT an Atom entry whose content is a VDF payload pointing at the template's model.</p></div>
+  </div>
+  <div class="note">The server honours the <b>Accept</b> header — if you get an unexpected content type back, check it first. The examples set it for you.</div>
+  <div class="note">The documentation doesn't describe authentication, so the examples send none.</div>
+  <h3>Content types</h3>
+  <div class="kv">
+    <dt>application/atomsvc+xml</dt><dd>Atom Service Document (RFC 5023)</dd>
+    <dt>application/atom+xml;type=feed</dt><dd>Collections (RFC 4287)</dd>
+    <dt>application/atom+xml;type=entry</dt><dd>Single entries</dd>
+    <dt>application/vnd.vizrt.payload+xml</dt><dd>VDF payload — field values</dd>
+    <dt>application/vnd.vizrt.model+xml</dt><dd>VDF model — field definitions of a template</dd>
+    <dt>text/html · application/xhtml+xml</dt><dd>Browser views of some resources — undocumented and may change</dd>
+  </div>
+  <h3>VDF in one glance</h3>
+  ${codeBlock("payload.xml",`<payload xmlns="http://www.vizrt.com/types" model="${base()}/templates/10003/model">\n  <field name="01"><value>Bob the Builder</value></field>\n  <field name="02"><value>Using REST API</value></field>\n</payload>`,"xml")}
+  <p style="font-size:13px;color:var(--mute)">Full specs: <a href="${base()}/documentation/vdf/model.html">VDF payload & model specification</a> (served by your PDS).</p>
+  <h3>XML namespaces</h3>
+  <div class="kv"><dt>app</dt><dd>http://www.w3.org/2007/app</dd><dt>atom</dt><dd>http://www.w3.org/2005/Atom</dd><dt>vdf</dt><dd>http://www.vizrt.com/types</dd><dt>vaext</dt><dd>http://www.vizrt.com/atom-ext</dd><dt>media</dt><dd>http://search.yahoo.com/mrss/</dd><dt>vizrt</dt><dd>http://www.vizrt.com/xmlns/types (service document)</dd></div>
+  <h3>Status codes</h3>
+  <p style="color:var(--mute);font-size:13.5px">The docs only state success codes: <b>200</b> for reads, creates and updates, <b>204</b> for deletes.</p>
+  </section>`;
+}
+
+function fieldsTable(f){
+  const rows=[];const subs=new Set();f.forEach(s=>{const a=s.split("|");if(a[4])a[4].split(",").forEach(x=>subs.add(x))});
+  for(const s of f){const [n,t,e,d,l]=s.split("|");const isList=l!=null;
+    rows.push(`<tr data-f="${esc(n)}"><td class="fn${subs.has(n)&&!isList?" sub":""}">${esc(n)}</td><td class="ty">${isList?"list":esc(t||"")}</td><td>${e==="1"?'<span class="ed">editable</span>':'<span class="ro">read-only</span>'}</td><td>${esc(d)}${isList&&l?`<div class="chips" style="margin-top:4px">${l.split(",").filter(Boolean).map(x=>`<span class="chip">${esc(x)}</span>`).join("")}</div>`:""}</td></tr>`)}
+  return `<details class="fields"><summary>VDF fields · ${f.length}</summary><table><thead><tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr></thead><tbody>${rows.join("")}</tbody></table></details>`;
+}
+
+function codesHtml(c){return `<div class="codes">${c.split(",").map(x=>{const m=x.match(/^(\d{3}):?(.*)$/);if(!m)return"";const t=m[2].trim()||CODE_TXT[m[1]]||"";return `<div class="code-row"><b class="c${m[1][0]}">${m[1]}</b><span>${esc(t)}</span></div>`}).join("")}</div>`}
+
+function epRight(r,i){
+  const [m,p,,,o]=r.ep[i];const lang=S.lang;const L=LANGS.find(x=>x[0]===lang)[1];
+  let h=`<div data-code>${codeBlock(L,gen(r,i,lang),lang)}</div>`;
+  if(o.b)h+=codeBlock(o.bf||"body.xml",o.b.replace(/HOST/g,base()),"xml");
+  return h;
+}
+
+function epHtml(r,i){
+  const [m,p,sum,codes,o]=r.ep[i];const id=`${r.id}-${i}`;
+  const params=[...p.matchAll(PRX)];
+  let L=`<p>${sum}.</p>`;
+  if(params.length)L+=`<div class="k">Parameters</div><div class="params">${params.map(x=>`<label>${esc(x[1])}</label><input data-param="${esc(pName(r,i,x[1]))}" value="${esc(S.params[pName(r,i,x[1])]??x[2])}" spellcheck="false">`).join("")}</div>`;
+  if(o.ct)L+=`<div class="k">Request content-type</div><span class="chip">${esc(o.ct)}</span>`;
+  if(o.rq)L+=`<div class="k">Required fields</div><div class="chips req">${o.rq.map(x=>`<span class="chip">${esc(x)}</span>`).join("")}</div>`;
+  L+=`<div class="k">Responses</div>${codesHtml(codes)}`;
+  if(o.tp)L+=`<div class="k">Notes</div><ul class="tips">${o.tp.map(t=>`<li>${t}</li>`).join("")}</ul>`;
+  if(o.x)for(const k in o.x)L+=`<div class="k">${esc(k)}</div><div class="chips">${o.x[k].map(v=>`<span class="chip">${esc(v)}</span>`).join("")}</div>`;
+  if(o.ln)L+=`<div class="k">Links in each entry</div><ul class="tips">${o.ln.map(t=>{const j=t.indexOf(": ");return `<li><code>${esc(t.slice(0,j))}</code> ${esc(t.slice(j+2))}</li>`}).join("")}</ul>`;
+  const destructive=m!=="GET";
+  L+=`<div class="k">Try it</div><div class="try">${o.b||o.bf?`<textarea data-body spellcheck="false">${esc((o.b||"").replace(/HOST/g,base()))}</textarea>`:""}${o.up?`<input type="file" data-file style="font-size:12.5px;margin-bottom:8px">`:""}
+    <div class="try-row"><button class="btn${destructive?" ghost":""}" data-send>${destructive?"Send "+m+"…":"Send request"}</button><span class="status" data-status></span></div>
+    <div class="resp" data-resp></div></div>`;
+  return `<div class="ep" id="${id}" data-ep="${r.id}|${i}"><div class="ep-h" data-toggle><span class="m ${m}">${m}</span><span class="path">${showPath(p)}</span><span class="ep-sum">${esc(sum)}</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 6 6 6-6 6"/></svg></div>
+  <div class="ep-b"><div class="ep-l">${L}</div><div class="ep-r">${epRight(r,i)}</div></div></div>`;
+}
+
+function render(){
+  let h=renderOverview();
+  for(const r of RES){
+    const cl=CLUSTER[r.c];
+    h+=`<section class="res" id="${r.id}" data-res="${r.id}"><div class="res-head"><h2>${esc(r.t)}</h2>${cl?`<span class="pill ${cl[1]}" title="${cl[2]}">${cl[0]}</span>`:""}${r.noauth?`<span class="pill noauth" title="Some GET requests on this resource work without credentials">No auth for GET</span>`:""}<span class="pill">${GROUPS[r.g]}</span></div>
+    <div class="intro">${r.d.map(p=>`<p>${p}</p>`).join("")}</div>${r.danger?`<div class="note warn-note">These calls stop or restart services. The Try-it button asks for a second click before sending.</div>`:""}
+    ${r.ep.map((_,i)=>epHtml(r,i)).join("")}${r.f?fieldsTable(r.f):""}</section>`;
+  }
+  h+=`<div class="empty" id="empty">No endpoints match your search.</div>`;
+  content.innerHTML=h;updateAuth();
+}
+
+function renderNav(){
+  let h=`<div class="nav-group"><a href="#overview" data-nav="overview">Overview</a></div>`;
+  GROUPS.forEach((g,gi)=>{h+=`<div class="nav-group" data-group="${gi}"><h4>${g}</h4>`;
+    for(const r of RES.filter(x=>x.g===gi)){const ms=[...new Set(r.ep.map(e=>e[0]))];
+      h+=`<a href="#${r.id}" data-nav="${r.id}"><span>${esc(r.t)}</span><span class="dots">${ms.map(m=>`<i style="background:var(--${m.toLowerCase()})" title="${m}"></i>`).join("")}</span></a><div data-hits="${r.id}"></div>`}
+    h+=`</div>`});
+  $("#nav").innerHTML=h;
+}
+
+function updateAuth(){const a=auth();$("#authPrev").textContent="Authorization: "+a;const el=$("#authHeader");if(el)el.textContent="Authorization: "+a;}
+function refreshCode(scope){
+  (scope||document).querySelectorAll(".ep").forEach(ep=>{const [rid,i]=ep.dataset.ep.split("|");const r=RES.find(x=>x.id===rid);ep.querySelector(".ep-r").innerHTML=epRight(r,+i)});
+}
+
+/* ============================== EVENTS ============================== */
+$("#langs").innerHTML=LANGS.map(([k,v])=>`<button data-lang="${k}" class="${k===S.lang?"on":""}">${v}</button>`).join("");
+$("#langs").onclick=e=>{const b=e.target.closest("[data-lang]");if(!b)return;S.lang=b.dataset.lang;save();$("#langs").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));refreshCode()};
+$("#user").value=S.user;$("#pass").value=S.pass;
+let t;const onCfg=()=>{S.bases[S.api]=$("#baseUrl").value.trim()||API[S.api].base;S.user=$("#user").value;S.pass=$("#pass").value;save();updateAuth();clearTimeout(t);t=setTimeout(()=>refreshCode(),150)};
+["baseUrl","user","pass"].forEach(id=>$("#"+id).addEventListener("input",onCfg));
+
+content.addEventListener("click",async e=>{
+  const tg=e.target.closest("[data-toggle]");if(tg){tg.parentElement.classList.toggle("open");return}
+  const cp=e.target.closest("[data-copy]");if(cp){const raw=cp.closest(".cb").querySelector("pre").dataset.raw;
+    const done=()=>{cp.textContent="Copied";cp.classList.add("ok");setTimeout(()=>{cp.textContent="Copy";cp.classList.remove("ok")},1400)};
+    try{await navigator.clipboard.writeText(raw);done()}catch(err){const ta=document.createElement("textarea");ta.value=raw;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(_){cp.textContent="Select & copy manually"}ta.remove()}return}
+  const sd=e.target.closest("[data-send]");if(sd)send(sd);
+});
+content.addEventListener("input",e=>{const p=e.target.closest("[data-param]");if(!p)return;S.params[p.dataset.param]=p.value;const ep=p.closest(".ep");const [rid,i]=ep.dataset.ep.split("|");ep.querySelector(".ep-r").innerHTML=epRight(RES.find(x=>x.id===rid),+i)});
+
+async function send(btn){
+  const ep=btn.closest(".ep");const [rid,i]=ep.dataset.ep.split("|");const r=RES.find(x=>x.id===rid);const [m,p,,,o]=r.ep[+i];
+  const st=ep.querySelector("[data-status]");const out=ep.querySelector("[data-resp]");
+  if(m!=="GET"&&btn.dataset.armed!=="1"){btn.dataset.armed="1";btn.textContent="Click again to send "+m;btn.classList.remove("ghost");btn.classList.add("warn");setTimeout(()=>{if(btn.dataset.armed==="1"){btn.dataset.armed="";btn.textContent="Send "+m+"…";btn.classList.add("ghost");btn.classList.remove("warn")}},4000);return}
+  btn.dataset.armed="";if(m!=="GET"){btn.textContent="Send "+m+"…";btn.classList.add("ghost");btn.classList.remove("warn")}
+  const url=base()+encodeUrlPath(fillPath(r,+i,p));const headers={};if(API[S.api].auth&&(!r.noauth||m!=="GET"))headers.Authorization=auth();if(o.ct)headers["Content-Type"]=o.ct;Object.assign(headers,o.hd||{});
+  let body;const ta=ep.querySelector("[data-body]");if(ta)body=ta.value;const fi=ep.querySelector("[data-file]");if(fi&&fi.files[0]){body=fi.files[0];headers["Content-Type"]=fi.files[0].type||o.ct}
+  st.textContent="Sending…";out.style.display="none";const t0=performance.now();
+  try{const res=await fetch(url,{method:m,headers,body});const ms=Math.round(performance.now()-t0);const ctype=res.headers.get("content-type")||"";
+    st.innerHTML=`<b class="c${String(res.status)[0]}" style="padding:1px 6px;border-radius:4px">${res.status}</b> ${esc(res.statusText)} · ${ms} ms · ${esc(ctype)}`;
+    if(/image\//.test(ctype)){const u=URL.createObjectURL(await res.blob());out.innerHTML=`<img src="${u}" style="max-width:100%;border-radius:8px;margin-top:4px">`}
+    else if(/audio|video|octet/.test(ctype)){const bl=await res.blob();out.innerHTML=`<p class="status">${bl.size.toLocaleString()} bytes of binary data received.</p>`}
+    else{let txt=await res.text();if(/xml/.test(ctype)||txt.trim().startsWith("<"))txt=prettyXml(txt);out.innerHTML=codeBlock("Response",txt.slice(0,200000),"xml")}
+    out.style.display="block";
+  }catch(err){
+    const same=location.origin===new URL(url,location.href).origin;
+    st.innerHTML="";out.style.display="block";
+    out.innerHTML=`<div class="note warn-note" style="margin:6px 0 0">The browser blocked this request${same?"":" — this page isn't served from your GH REST server, so cross-origin calls are refused"}. ${same?"Check that GH REST is running.":"Copy the example on the right into a terminal instead, or host this page in GH REST's <code>wwwroot</code> so Try&nbsp;it runs same-origin."}<br><span class="status">${esc(err.message)}</span></div>`;
+  }
+}
+function prettyXml(x){try{const d=new DOMParser().parseFromString(x,"application/xml");if(d.querySelector("parsererror"))return x;
+  const ser=(n,ind)=>{if(n.nodeType===3){const t=n.nodeValue.trim();return t?ind+t+"\n":""}if(n.nodeType===8)return ind+"<!--"+n.nodeValue+"-->\n";if(n.nodeType!==1)return"";
+    const at=[...n.attributes].map(a=>` ${a.name}="${a.value}"`).join("");const kids=[...n.childNodes];
+    if(!kids.length)return `${ind}<${n.nodeName}${at}/>\n`;
+    if(kids.length===1&&kids[0].nodeType===3)return `${ind}<${n.nodeName}${at}>${kids[0].nodeValue.trim()}</${n.nodeName}>\n`;
+    return `${ind}<${n.nodeName}${at}>\n${kids.map(k=>ser(k,ind+"  ")).join("")}${ind}</${n.nodeName}>\n`};
+  return ser(d.documentElement,"")}catch(e){return x}}
+
+/* search */
+$("#q").addEventListener("input",()=>{
+  const q=$("#q").value.trim().toLowerCase();let any=false;
+  document.querySelectorAll("section.res").forEach(sec=>{
+    const r=RES.find(x=>x.id===sec.dataset.res);let secHit=!q||r.t.toLowerCase().includes(q)||r.d.join(" ").toLowerCase().includes(q);
+    const hits=[];
+    sec.querySelectorAll(".ep").forEach((ep,i)=>{const e=r.ep[i];const hay=(e[0]+" "+e[1]+" "+e[2]+" "+JSON.stringify(e[4])).toLowerCase();const hit=!q||hay.includes(q)||secHit;ep.style.display=hit?"":"none";if(q&&hay.includes(q))hits.push([i,e])});
+    const fHit=q&&(r.f||[]).some(f=>f.split("|")[0].toLowerCase().includes(q));
+    const show=!q||secHit||hits.length||fHit;sec.style.display=show?"":"none";if(show)any=true;
+    if(fHit&&!secHit&&!hits.length)sec.querySelectorAll(".ep").forEach(ep=>ep.style.display="");
+    if(fHit){const d=sec.querySelector("details.fields");if(d)d.open=true}
+    sec.querySelectorAll("tr[data-f]").forEach(tr=>tr.style.background=q&&tr.dataset.f.toLowerCase().includes(q)?"var(--accent-soft)":"");
+    const nav=document.querySelector(`[data-nav="${r.id}"]`);nav.style.display=show?"":"none";
+    document.querySelector(`[data-hits="${r.id}"]`).innerHTML=q&&!secHit?hits.slice(0,4).map(([i,e])=>`<a class="hit" href="#${r.id}-${i}">${e[0]} ${esc(e[1].replace(PRX,"{$1}"))}</a>`).join(""):"";
+  });
+  document.querySelectorAll("[data-group]").forEach(g=>{g.style.display=[...g.querySelectorAll("[data-nav]")].some(a=>a.style.display!=="none")?"":"none"});
+  $("#overview").style.display=q?"none":"";$("#empty").style.display=any?"none":"block";
+});
+document.addEventListener("keydown",e=>{if(e.key==="/"&&document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA"){e.preventDefault();$("#q").focus()}if(e.key==="Escape"&&document.activeElement===$("#q")){$("#q").value="";$("#q").dispatchEvent(new Event("input"))}});
+$("#nav").addEventListener("click",e=>{const a=e.target.closest("a");if(!a)return;$("#side").classList.remove("show");const id=a.getAttribute("href").slice(1);const el=document.getElementById(id);if(el&&el.classList.contains("ep"))el.classList.add("open")});
+$("#menuBtn").onclick=()=>$("#side").classList.toggle("show");
+
+/* scroll spy */
+function spy(){const secs=[$("#overview"),...document.querySelectorAll("section.res")];let cur="overview";for(const s of secs){if(s.style.display==="none")continue;if(s.getBoundingClientRect().top<120)cur=s.id}
+  document.querySelectorAll("[data-nav]").forEach(a=>a.classList.toggle("active",a.dataset.nav===cur))}
+window.addEventListener("scroll",()=>requestAnimationFrame(spy),{passive:true});
+
+function openHash(){const h=location.hash.slice(1);if(!h)return;const want=h.startsWith("pds")?"pds":(h==="overview"?S.api:"gh");if(want!==S.api)switchApi(want,true);const el=document.getElementById(h);if(!el)return;if(el.classList.contains("ep"))el.classList.add("open");setTimeout(()=>el.scrollIntoView({block:"start"}),30)}
+window.addEventListener("hashchange",openHash);
+
+function switchApi(k,keepScroll){
+  S.api=k;RES=API[k].res;GROUPS=API[k].groups;save();
+  $("#apis").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.api===k));
+  $("#brand").innerHTML=`${API[k].name}<small>${API[k].sub}</small>`;
+  document.title=API[k].name+" REST API — Interactive Reference";
+  $("#baseUrl").value=S.bases[k];
+  document.querySelectorAll(".authfield").forEach(e=>e.classList.toggle("hide",!API[k].auth));
+  $("#q").value="";renderNav();render();
+  document.querySelector("#"+API[k].first+" .ep")?.classList.add("open");
+  if(!keepScroll)window.scrollTo(0,0);spy();
+}
+$("#apis").onclick=e=>{const b=e.target.closest("[data-api]");if(b&&b.dataset.api!==S.api){history.replaceState(null,"",location.pathname);switchApi(b.dataset.api)}};
+const h0=location.hash.slice(1);
+switchApi(h0.startsWith("pds")?"pds":h0&&GH_RES.some(r=>h0.startsWith(r.id))?"gh":(S.api in API?S.api:"gh"),true);
+openHash();
+</script>
+</body>
+</html>
